@@ -277,6 +277,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//カメラアングル
 	float angle = 0.0f;
 
+	//座標
+	XMFLOAT3 scale;
+	XMFLOAT3 rotation;
+	XMFLOAT3 position;
+	scale = {1.0f,1.0f,1.0f};
+	rotation = {0.0f,0.0f,0.0f};
+	position = { 0.0f,0.0f,0.0f };
+
 	//頂点データ全体のサイズ = 頂点データ1つ分のサイズ * 頂点の要素数
 	UINT sizeVB = static_cast<UINT>(sizeof(vertices[0]) * _countof(vertices));
 
@@ -418,12 +426,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	XMFLOAT3 eye(0, 0, -150);//視点座標
 	XMFLOAT3 target(0,0,0);//注視点座標
 	XMFLOAT3 up(0,1,0);//上方向ベクトル
-
 	//ビュー変換行列の計算
 	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
-	
-	//定数バッファに転送
-	constMapTransform->mat = matView * matProjection;
+
+	//ワールド変換行列
+	XMMATRIX matWorld;
+	//スケーリング行列
+	XMMATRIX matScale;
+	//回転行列
+	XMMATRIX matRot;
+	//平行移動行列
+	XMMATRIX matTrans;
+
 
 	//インデックスデータ全体のサイズ
 	UINT sizeIB = static_cast<UINT>(sizeof(uint16_t)) * _countof(indices);
@@ -798,8 +812,48 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 			matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 		};
 
+		//
+		if (keys[DIK_UP] || keys[DIK_DOWN] || keys[DIK_LEFT] || keys[DIK_RIGHT])
+		{
+			if (keys[DIK_UP])
+			{
+				position.z += 1.0f;
+			}
+			if (keys[DIK_DOWN])
+			{
+				position.z -= 1.0f;
+			}
+			if (keys[DIK_LEFT])
+			{
+				position.x -= 1.0f;;
+			}
+			if (keys[DIK_RIGHT])
+			{
+				position.x += 1.0f;;
+			}
+		};
+
+		
+		matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
+	
+		//単位行列を代入
+		matRot = XMMatrixIdentity();
+
+		matRot = XMMatrixRotationZ(rotation.z);
+		matRot = XMMatrixRotationX(rotation.x);
+		matRot = XMMatrixRotationY(rotation.y);
+
+		matTrans = XMMatrixTranslation(position.x, position.y, position.z);
+		
+		//単位行列を代入
+		matWorld = XMMatrixIdentity();
+		//行列に計算
+		matWorld *= matScale;
+		matWorld *= matRot;
+		matWorld *= matTrans;
+
 		//定数バッファに転送
-		constMapTransform->mat = matView * matProjection;
+		constMapTransform->mat = matWorld * matView * matProjection;
 
 		//バックバッファの番号を解除
 		UINT bbIndex = swapChain->GetCurrentBackBufferIndex();
