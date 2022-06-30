@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\tsuba\OneDrive\デスクトップ\新しいフォルダー (5)\DirectXTex-feb2022\DirectXTex\DirectXTex_Desktop_2022.vcxproj">
@@ -164,6 +165,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Mesh.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
