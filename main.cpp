@@ -259,10 +259,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	};
 
 	Vertex vertices[] = {
-			{ {-50.0f , -50.0f , 150.0f} , {0.0f,1.0f}},//左下 インデックス0
-			{ {-50.0f ,  50.0f , 150.0f} , {0.0f,0.0f}},//左上 インデックス1
-			{ { 50.0f , -50.0f , 150.0f} , {1.0f,1.0f}},//右下 インデックス2
-			{ { 50.0f ,  50.0f , 150.0f} , {1.0f,0.0f}},//右上 インデックス3
+			{ {-50.0f , -50.0f , 0.0f} , {0.0f,1.0f}},//左下 インデックス0
+			{ {-50.0f ,  50.0f , 0.0f} , {0.0f,0.0f}},//左上 インデックス1
+			{ { 50.0f , -50.0f , 0.0f} , {1.0f,1.0f}},//右下 インデックス2
+			{ { 50.0f ,  50.0f , 0.0f} , {1.0f,0.0f}},//右上 インデックス3
 	};
 
 	//インデックスデータ
@@ -271,6 +271,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		0,1,2,//三角形1つ目
 		1,2,3,//三角形2つ目
 	};
+
+	BYTE keys[256] = {};
+	BYTE oldkeys[256] = {};
+	//カメラアングル
+	float angle = 0.0f;
 
 	//頂点データ全体のサイズ = 頂点データ1つ分のサイズ * 頂点の要素数
 	UINT sizeVB = static_cast<UINT>(sizeof(vertices[0]) * _countof(vertices));
@@ -399,26 +404,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//単位行列を代入
 	constMapTransform->mat = XMMatrixIdentity();
-	////
-	//constMapTransform->mat.r[0].m128_f32[0] = 2.0f / window_width;
-	//constMapTransform->mat.r[1].m128_f32[1] = -2.0f / window_height;
-	//constMapTransform->mat.r[3].m128_f32[0] = -1.0f;
-	//constMapTransform->mat.r[3].m128_f32[1] = 1.0f;
-	
-	////平行投影行列の計算	
-	//constMapTransform->mat = XMMatrixOrthographicOffCenterLH(
-	//	0.0f,100.0f,//左端、右端
-	//	100.0f,0.0f,//下端、上端
-	//	0.0f,1.0f//前端、奥端
-	//	);//LH = LeftHandの略
 
 	//透視投影行列の計算	
-	constMapTransform->mat = XMMatrixPerspectiveFovLH(
+	XMMATRIX matProjection = XMMatrixPerspectiveFovLH(
 		XMConvertToRadians(45.0f),//上下画角45度
 		(float)window_width / window_height,//アスペクト比
 		0.1f, 1000.0f//前端、奥端
 		);
+
+	//ビュー変換行列
+	XMMATRIX matView;
+
+	XMFLOAT3 eye(0, 0, -150);//視点座標
+	XMFLOAT3 target(0,0,0);//注視点座標
+	XMFLOAT3 up(0,1,0);//上方向ベクトル
+
+	//ビュー変換行列の計算
+	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
 	
+	//定数バッファに転送
+	constMapTransform->mat = matView * matProjection;
+
 	//インデックスデータ全体のサイズ
 	UINT sizeIB = static_cast<UINT>(sizeof(uint16_t)) * _countof(indices);
 
@@ -768,6 +774,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 
 		//ここからDirectX毎フレーム処理
+		//キーボード情報の取得開始
+		keyboard->Acquire();
+
+		//全キーの入力状態を取得する
+		keyboard->GetDeviceState(sizeof(keys), keys);
+
+		if (keys[DIK_D] || keys[DIK_A])
+		{
+			if (keys[DIK_D])
+			{
+				angle += XMConvertToRadians(1.0f);
+			}
+			else if (keys[DIK_A])
+			{
+				angle -= XMConvertToRadians(1.0f);
+			}
+			//アングルラジアンだけY軸周りに回転。半径は-150
+			eye.x = -150 * sinf(angle);
+			eye.z = -150 * cosf(angle);
+
+			//ビュー変換行列の計算
+			matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
+		};
+
+		//定数バッファに転送
+		constMapTransform->mat = matView * matProjection;
 
 		//バックバッファの番号を解除
 		UINT bbIndex = swapChain->GetCurrentBackBufferIndex();
