@@ -306,7 +306,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		0,1,2,//三角形1つ目
 		2,1,3,//三角形2つ目
 
-		//後(前の面に4加算)
+		//奥(前の面に4加算)
 		5,4,6,//三角形3つ目
 		5,6,7,//三角形4つ目
 
@@ -325,7 +325,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//上
 		20,22,21,//三角形11つ目
 		21,22,23,//三角形12つ目
-		
 		
 
 	};
@@ -369,6 +368,35 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		nullptr,
 		IID_PPV_ARGS(&vertBuff));
 	assert(SUCCEEDED(result));
+
+	for (int i = 0; i < _countof(indices) / 3; i++)
+	{
+	//三角形1つ毎に計算する
+		//三角形のインデックスを取り出して、一時的な変数に入れる
+		unsigned short indexZero = indices[i * 3 + 0];
+		unsigned short indexOne  = indices[i * 3 + 1];
+		unsigned short indexTwo  = indices[i * 3 + 2];
+
+		//三角形を構成する頂点座標をベクトルに代入
+		XMVECTOR p0 = XMLoadFloat3(&vertices[indexZero].pos);
+		XMVECTOR p1 = XMLoadFloat3(&vertices[indexOne].pos);
+		XMVECTOR p2 = XMLoadFloat3(&vertices[indexTwo].pos);
+
+		//p0→p1、p0→p2ベクトルを計算(減算)
+		XMVECTOR v1 = XMVectorSubtract(p1, p0);
+		XMVECTOR v2 = XMVectorSubtract(p2, p0);
+
+		//外積は両方から垂直なベクトル
+		XMVECTOR normal = XMVector3Cross(v1,v2);
+
+		//正規化(長さを1にする)
+		normal = XMVector3Normalize(normal);
+
+		//求めた法線を頂点データに代入
+		XMStoreFloat3(&vertices[indexZero].normal, normal);
+		XMStoreFloat3(&vertices[indexOne].normal, normal);
+		XMStoreFloat3(&vertices[indexTwo].normal, normal);
+	}
 
 	//GPU上のバッファに対応した仮想メモリ(メインメモリ上)を取得
 	Vertex* vertMap = nullptr;
