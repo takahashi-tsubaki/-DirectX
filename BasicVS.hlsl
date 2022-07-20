@@ -1,12 +1,18 @@
-#include "Basic.hlsli"
+//#include "Basic.hlsli"
+//
+//VSOutput main(float4 pos : POSITION,float3 normal : NORMAL, float2 uv : TEXCOORD)
+//{
+//	VSOutput output;//ピクセルシェーダに渡す値
+//	//output.svpos = pos;
+//	output.svpos = mul(mat,pos);//座標に行輝を計算
+//	output.normal = normal;
+//	output.uv = uv;
+//
+//	return output;
+//}
 
-VSOutput main(float4 pos : POSITION,float3 normal : NORMAL, float2 uv : TEXCOORD)
+//頂点シェーダ
+float4 main(float4 pos : POSITION) : SV_POSITION
 {
-	VSOutput output;//ピクセルシェーダに渡す値
-	//output.svpos = pos;
-	output.svpos = mul(mat,pos);//座標に行輝を計算
-	output.normal = normal;
-	output.uv = uv;
-
-	return output;
+	return pos * float4(0.5f,0.5f,1,1);
 }
