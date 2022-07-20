@@ -642,17 +642,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	TexMetadata metaData{};
 	ScratchImage scratchImg{};
 
-	
-
-	
-
 	result = LoadFromWICFile(
 		L"Resource/mario.jpg",
 		WIC_FLAGS_NONE,
 		&metaData, scratchImg
 	);
-
-	
 
 	ScratchImage mipChain{};
 	result = GenerateMipMaps(
@@ -665,12 +659,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		metaData = scratchImg.GetMetadata();
 	}
 
-	
-
 	//読み込んだディフューズテクスチャをSRGBとして扱う
 	metaData.format = MakeSRGB(metaData.format);
-
-	
 
 	//ヒープ設定
 	D3D12_HEAP_PROPERTIES textureHeapProp{};
@@ -688,7 +678,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	textureResourceDesc.MipLevels = (UINT16)metaData.mipLevels;
 	textureResourceDesc.SampleDesc.Count = 1;
 
-	
 	//テクスチャバッファを生成
 	ID3D12Resource* textureBuff = nullptr;
 	result = dev->CreateCommittedResource(
@@ -713,11 +702,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		);
 		assert(SUCCEEDED(result));
 	}
-
 	
 	const size_t kMaxSRVCount = 2056;//SRV = シェーダリソースビュー
 	
-
 	//デスクリプタヒープの設定(生成)
 	D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
 	srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -751,7 +738,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		&metaData2, scratchImg2
 	);
 
-	/*ScratchImage mipChain{};*/
 	result = GenerateMipMaps(
 		scratchImg2.GetImages(), scratchImg2.GetImageCount(), scratchImg2.GetMetadata(),
 		TEX_FILTER_DEFAULT, 0, mipChain
@@ -1284,10 +1270,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//SRVヒープの先頭ハンドルを取得
 		D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = srvHeap->GetGPUDescriptorHandleForHeapStart();
 
-		////SRVヒープの先頭にあるSRVをルートパラメータの1番に設定
-		//commandList->SetGraphicsRootDescriptorTable(1, srvGpuHandle);
-
-		srvGpuHandle.ptr += incrementSize;
+		//SRVヒープの先頭にあるSRVをルートパラメータの1番に設定
+		
+		if (keys[DIK_SPACE])
+		{
+			srvGpuHandle.ptr += incrementSize;
+		}
+		
 		//SRVヒープの先頭にあるSRVをルートパラメータの1番に設定
 		commandList->SetGraphicsRootDescriptorTable(1, srvGpuHandle);
 
