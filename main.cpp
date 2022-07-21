@@ -891,7 +891,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//ここまで描画初期化処理
 
 	FLOAT clearColor[] = { 0.1f, 0.25f, 0.5f, 0.0f };//青っぽい色
-	XMFLOAT4 objectColor = { 0.0f,0.25f,1.0f,0.5f };
+	
+	XMFLOAT4 objectColor = { 0.0f,0.0f,0.0f,0.5f };
+
+	int changephase = 0;
+
 	int Culling = 0;
 	//ゲームループ
 	while (true)
@@ -915,19 +919,64 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		//全キーの入力状態を取得する
 		keyboard->GetDeviceState(sizeof(keys), keys);
-
-		if (objectColor.y < 1)
+			
+		//
+		//if (objectColor.x < 1)
+		//{
+		//	objectColor.x += 0.001f;
+		//}
+		//if (objectColor.x >= 1)
+		//{
+		//	objectColor.x -= 0.001f;
+		//	objectColor.y += 0.001f;
+		//}
+		//if (objectColor.y >= 1)
+		//{
+		//	objectColor.y -= 0.001f;
+		//	objectColor.z += 0.001f;
+		//}
+		///*if (objectColor.z >= 1)
+		//{
+		//	objectColor.y -= 0.001f;
+		//}*/
+	
+		if (changephase == 0)
 		{
-			objectColor.y += 0.001f;
+			objectColor.x += 0.005f;
+			if (objectColor.x > 1)
+			{
+				changephase = 1;
+			}
+			if (objectColor.z >0)
+			{
+				objectColor.z -= 0.005f;
+			}
+			
 		}
-		else if (objectColor.y >= 1)
+		if (changephase == 1)
 		{
-			objectColor.z -= 0.001f;
+			objectColor.y += 0.005f;
+			if (objectColor.y > 1)
+			{
+				changephase = 2;
+			}
+			if (objectColor.x > 0)
+			{
+				objectColor.x -= 0.005f;
+			}
+			
 		}
-		if (objectColor.z <= 0 && objectColor.y >= 1)
+		if (changephase == 2)
 		{
-			objectColor.y = 0.25f;
-			objectColor.z = 1.0f;
+			objectColor.z += 0.005f;
+			if (objectColor.z > 1)
+			{
+				changephase = 0;
+			}
+			if (objectColor.y > 0)
+			{
+				objectColor.y -= 0.005f;
+			}
 		}
 
 		constMapMaterial->color = objectColor;
