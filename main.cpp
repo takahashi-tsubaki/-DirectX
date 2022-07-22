@@ -920,25 +920,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//全キーの入力状態を取得する
 		keyboard->GetDeviceState(sizeof(keys), keys);
 			
-		//
-		//if (objectColor.x < 1)
-		//{
-		//	objectColor.x += 0.001f;
-		//}
-		//if (objectColor.x >= 1)
-		//{
-		//	objectColor.x -= 0.001f;
-		//	objectColor.y += 0.001f;
-		//}
-		//if (objectColor.y >= 1)
-		//{
-		//	objectColor.y -= 0.001f;
-		//	objectColor.z += 0.001f;
-		//}
-		///*if (objectColor.z >= 1)
-		//{
-		//	objectColor.y -= 0.001f;
-		//}*/
+		
 	
 		if (changephase == 0)
 		{
