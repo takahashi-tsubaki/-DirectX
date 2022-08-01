@@ -14,8 +14,7 @@
 //=====================================================================================
 // Bitmask flags enumerator operators
 //=====================================================================================
-#pragma warning(push)
-#pragma warning(disable: 26812 )
+
 // 警告が出るコード
 DEFINE_ENUM_FLAG_OPERATORS(CP_FLAGS);
 DEFINE_ENUM_FLAG_OPERATORS(DDS_FLAGS);
@@ -193,4 +192,3 @@ inline HRESULT __cdecl SaveToTGAFile(const Image& image, const wchar_t* szFile, 
     return SaveToTGAFile(image, TGA_FLAGS_NONE, szFile, metadata);
 }
 
-#pragma warning(pop)
