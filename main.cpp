@@ -900,7 +900,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 	//頂点シェーダの読み込みとコンパイル(頂点シェーダは頂点の座標変換)
 	result = D3DCompileFromFile(
-		L"BasicVS.hlsl",//シェーダーファイル名
+		L"Resource/shaders/BasicVS.hlsl",//シェーダーファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,//インクルードを可能にする
 		"main",//エントリーポイント
@@ -927,7 +927,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 	//ピクセルシェーダの読み込みとコンパイル(ピクセルの役割は描画色の設定)
 	result = D3DCompileFromFile(
-		L"BasicPS.hlsl",//シェーダファイル名
+		L"Resource/shaders/BasicPS.hlsl",//シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main",
