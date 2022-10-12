@@ -13,6 +13,8 @@
 
 #include <DirectXTex.h> 
 
+#include "Input.h"
+
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
@@ -156,6 +158,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	ComPtr<ID3D12CommandQueue>commandQueue;
 	ID3D12DescriptorHeap* rtvHeap;
 
+	Input* input = nullptr;
+
+	input = new Input();
+	input->Initialize(w.hInstance,hwnd);
+
 	//DXGIファクトリーの生成
 	result = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 	assert(SUCCEEDED(result));
@@ -289,26 +296,26 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 	result = dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 
-	//DirectInputの初期化
-	IDirectInput8* directInput = nullptr;
-	result = DirectInput8Create(w.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
-	assert(SUCCEEDED(result));
+	////DirectInputの初期化
+	//IDirectInput8* directInput = nullptr;
+	//result = DirectInput8Create(w.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+	//assert(SUCCEEDED(result));
 
-	//キーボードデバイスの生成
-	IDirectInputDevice8* keyboard = nullptr;
-	result = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
-	assert(SUCCEEDED(result));
+	////キーボードデバイスの生成
+	//IDirectInputDevice8* keyboard = nullptr;
+	//result = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
+	//assert(SUCCEEDED(result));
 
-	//入力データ形式のセット
-	result = keyboard->SetDataFormat(&c_dfDIKeyboard);
-	assert(SUCCEEDED(result));
+	////入力データ形式のセット
+	//result = keyboard->SetDataFormat(&c_dfDIKeyboard);
+	//assert(SUCCEEDED(result));
 
-	//排他制御レベルのセット
-	result = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	assert(SUCCEEDED(result));
-	//DISCL_FOREGROUND   画面が手前にある場合のみ入力を受け付ける
-	//DISCL_NONEXCLUSIVE デバイスをこのアプリだけで専有しない
-	//DISCL_NOWINKEY     Windowsキーを無効にする
+	////排他制御レベルのセット
+	//result = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	//assert(SUCCEEDED(result));
+	////DISCL_FOREGROUND   画面が手前にある場合のみ入力を受け付ける
+	////DISCL_NONEXCLUSIVE デバイスをこのアプリだけで専有しない
+	////DISCL_NOWINKEY     Windowsキーを無効にする
 
 
 
@@ -391,8 +398,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 	};
 
-	BYTE keys[256] = {};
-	BYTE oldkeys[256] = {};
+	/*BYTE keys[256] = {};
+	BYTE oldkeys[256] = {};*/
 	//カメラアングル
 	float angle = 0.0f;
 
@@ -1095,55 +1102,71 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		}
 
 		//ここからDirectX毎フレーム処理
-		//キーボード情報の取得開始
-		keyboard->Acquire();
-
-		//全キーの入力状態を取得する
-		keyboard->GetDeviceState(sizeof(keys), keys);
-
-		if (keys[DIK_D] || keys[DIK_A]||keys[DIK_R])
-		{
-			if (keys[DIK_D])
-			{
-				angle += XMConvertToRadians(1.0f);
-			}
-			else if (keys[DIK_A])
-			{
-				angle -= XMConvertToRadians(1.0f);
-			}
-			else if (keys[DIK_R])
-			{
-				angle = 0.0f;
-			}
-			//アングルラジアンだけY軸周りに回転。半径は-150
-			eye.x = -150 * sinf(angle);
-			eye.z = -150 * cosf(angle);
-
-			//ビュー変換行列の計算
-			matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
-		};
+		////キーボード情報の取得開始
 		
-		//
-		if (keys[DIK_UP] || keys[DIK_DOWN] || keys[DIK_LEFT] || keys[DIK_RIGHT] )
+		input->Update();
+
+		if (input->PushKey(DIK_D))
 		{
-			if (keys[DIK_UP])
-			{
-				object3ds[0].translation.y += 0.5f;
-			}
-			if (keys[DIK_DOWN])
-			{
-				object3ds[0].translation.y -= 0.5f;
-			}
-			if (keys[DIK_LEFT])
-			{
-				object3ds[0].translation.x -= 0.5f;
-			}
-			if (keys[DIK_RIGHT])
-			{
-				object3ds[0].translation.x += 0.5f;
-			}
-			
-		};
+			angle += XMConvertToRadians(1.0f);
+		}
+
+		if(input->TriggerKey(DIK_SPACE))
+		{
+			OutputDebugStringA("Hit 0\n");
+		}
+
+		//ビュー変換行列の計算
+		matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
+		
+		//keyboard->Acquire();
+
+		////全キーの入力状態を取得する
+		//keyboard->GetDeviceState(sizeof(keys), keys);
+
+		//if (keys[DIK_D] || keys[DIK_A]||keys[DIK_R])
+		//{
+		//	if (keys[DIK_D])
+		//	{
+		//		angle += XMConvertToRadians(1.0f);
+		//	}
+		//	else if (keys[DIK_A])
+		//	{
+		//		angle -= XMConvertToRadians(1.0f);
+		//	}
+		//	else if (keys[DIK_R])
+		//	{
+		//		angle = 0.0f;
+		//	}
+		//	//アングルラジアンだけY軸周りに回転。半径は-150
+		//	eye.x = -150 * sinf(angle);
+		//	eye.z = -150 * cosf(angle);
+
+		//	//ビュー変換行列の計算
+		//	matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
+		//};
+		//
+		////
+		//if (keys[DIK_UP] || keys[DIK_DOWN] || keys[DIK_LEFT] || keys[DIK_RIGHT] )
+		//{
+		//	if (keys[DIK_UP])
+		//	{
+		//		object3ds[0].translation.y += 0.5f;
+		//	}
+		//	if (keys[DIK_DOWN])
+		//	{
+		//		object3ds[0].translation.y -= 0.5f;
+		//	}
+		//	if (keys[DIK_LEFT])
+		//	{
+		//		object3ds[0].translation.x -= 0.5f;
+		//	}
+		//	if (keys[DIK_RIGHT])
+		//	{
+		//		object3ds[0].translation.x += 0.5f;
+		//	}
+		//	
+		//};
 
 	
 		for (int i = 0; i < _countof(object3ds); i++)
@@ -1320,7 +1343,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		//ここまでDirectX毎フレーム処理
 	}
 	UnregisterClass(w.lpszClassName, w.hInstance);
-	
+	//入力解放
+	delete input;
 
 	return 0;
 }
