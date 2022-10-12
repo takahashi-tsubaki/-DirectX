@@ -4,7 +4,6 @@
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
 
-
 using namespace DirectX;
 
 //定数バッファ
