@@ -1,12 +1,12 @@
 #include "Input.h"
 
-void Input::Initialize(HINSTANCE hInstance,HWND hwnd)
+void Input::Initialize(WinApp* winApp)
 {
-
+	this->winapp_ = winApp;
 	HRESULT result;
 
 	//DirectInputの初期化
-	result = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+	result = DirectInput8Create(winapp_->GetInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
 	assert(SUCCEEDED(result));
 
 	//キーボードデバイスの生成
@@ -18,7 +18,7 @@ void Input::Initialize(HINSTANCE hInstance,HWND hwnd)
 	assert(SUCCEEDED(result));
 
 	//排他制御レベルのセット
-	result = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	result = keyboard->SetCooperativeLevel(winapp_->Gethwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(result));
 	//DISCL_FOREGROUND   画面が手前にある場合のみ入力を受け付ける
 	//DISCL_NONEXCLUSIVE デバイスをこのアプリだけで専有しない

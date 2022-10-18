@@ -4,6 +4,7 @@
 #define DIRECTINPUT_VERSION  0x0800
 #include <dinput.h>
 
+#include "WinApp.h"
 #include <windows.h>
 #include <wrl.h>
 
@@ -20,7 +21,7 @@ public:
 	/// <summary>
 	/// èâä˙âª
 	/// </summary>
-	void Initialize(HINSTANCE hInstance, HWND hwnd);
+	void Initialize(WinApp*winApp);
 
 	/// <summary>
 	/// çXêV
@@ -58,5 +59,6 @@ private:
 	BYTE keys[256] = {};
 	BYTE oldkeys[256] = {};
 
+	WinApp* winapp_ = nullptr;
 
 };
