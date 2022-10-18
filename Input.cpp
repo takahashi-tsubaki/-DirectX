@@ -61,3 +61,14 @@ bool Input::TriggerKey(BYTE keyNum)
 	// ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse‚ğ•Ô‚·
 	return false;
 }
+
+bool Input::ReleaseKey(BYTE keyNum)
+{
+	// w’èƒL[‚ğ—£‚³‚ê‚Ä‚¢‚é‚½‚Étrue‚ğ•Ô‚·
+	if (oldkeys[keyNum] && !keys[keyNum])
+	{
+		return true;
+	}
+	// ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse‚ğ•Ô‚·
+	return false;
+}

@@ -141,13 +141,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 	HRESULT result;
 	//受け皿となる変数
-	/*ID3D12Device* dev = nullptr;
-	IDXGIFactory7* dxgiFactory = nullptr;
-	IDXGISwapChain4* swapChain = nullptr;
-	ID3D12CommandAllocator* cmdAllocator = nullptr;
-	ID3D12GraphicsCommandList* commandList = nullptr;
-	ID3D12CommandQueue* commandQueue = nullptr;
-	ID3D12DescriptorHeap* rtvHeap = nullptr;*/
 
 	ComPtr<ID3D12Device>dev;
 	ComPtr<IDXGIFactory7>dxgiFactory;
@@ -1104,17 +1097,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		//ここからDirectX毎フレーム処理
 		////キーボード情報の取得開始
 		
-		input->Update();
-
-		if (input->PushKey(DIK_D))
-		{
-			angle += XMConvertToRadians(1.0f);
-		}
-
-		if(input->TriggerKey(DIK_SPACE))
-		{
-			OutputDebugStringA("Hit 0\n");
-		}
+	
 
 		//ビュー変換行列の計算
 		matView = XMMatrixLookAtLH(XMLoadFloat3(&eye), XMLoadFloat3(&target), XMLoadFloat3(&up));
@@ -1168,7 +1151,24 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		//	
 		//};
 
-	
+		input->Update();
+
+		if (input->PushKey(DIK_D))
+		{
+			angle += XMConvertToRadians(1.0f);
+		}
+
+		if (input->TriggerKey(DIK_SPACE))
+		{
+			OutputDebugStringA("Hit 0\n");
+		}
+
+		if (input->ReleaseKey(DIK_RETURN))
+		{
+			OutputDebugStringA("Hit 0\n");
+		}
+
+
 		for (int i = 0; i < _countof(object3ds); i++)
 		{
 			UpdateObject3d(&object3ds[i], matView, matProjection);
