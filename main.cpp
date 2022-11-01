@@ -16,6 +16,7 @@
 #include "Input.h"
 #include "WinApp.h"
 #include "DirectXCommon.h"
+#include "FPS.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -98,6 +99,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	Input* input = nullptr;
 	WinApp* winApp = nullptr;
 	DirectXCommon* dxCommon = nullptr;
+	FPS* fps = new FPS;
 
 	winApp = new WinApp();
 	winApp->Initialize();
@@ -654,52 +656,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	samplerDesc.ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;//ピクセルシェーダからのみ使用可能
 
 
-	////深度バッファのリソース設定
-	////リソース設定
-	//D3D12_RESOURCE_DESC depthResourceDesc{};
-	//depthResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-	//depthResourceDesc.Width = WinApp::window_width;//レンダーターゲットに合わせる
-	//depthResourceDesc.Height = WinApp::window_height;//レンダーターゲットに合わせる
-	//depthResourceDesc.DepthOrArraySize = 1;
-	//depthResourceDesc.Format = DXGI_FORMAT_D32_FLOAT;//深度値フォーマット
-	//depthResourceDesc.SampleDesc.Count = 1;
-	//depthResourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;//デプスステンシル
-
-	////深度値用ヒーププロパティ
-	//D3D12_HEAP_PROPERTIES depthHeapProp{};
-	//depthHeapProp.Type = D3D12_HEAP_TYPE_DEFAULT;
-	////深度値のクリア設定
-	//D3D12_CLEAR_VALUE depthClearValue{};
-	//depthClearValue.DepthStencil.Depth = 1.0f;//深度値1.0f(最大値)でクリア
-	//depthClearValue.Format = DXGI_FORMAT_D32_FLOAT;//深度値フォーマット
-
-	////深度バッファの生成
-	//ComPtr<ID3D12Resource> depthBuff = nullptr;
-	//result = dev->CreateCommittedResource(
-	//	&depthHeapProp,
-	//	D3D12_HEAP_FLAG_NONE,
-	//	&depthResourceDesc,
-	//	D3D12_RESOURCE_STATE_DEPTH_WRITE,//深度値書き込みに使用
-	//	&depthClearValue,
-	//	IID_PPV_ARGS(&depthBuff));
-
-	////深度ビュー用デスクリプタヒープの設定
-	//D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc{};
-	//dsvHeapDesc.NumDescriptors = 1;
-	//dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-	//ComPtr<ID3D12DescriptorHeap> dsvHeap = nullptr;
-	//result = dev->CreateDescriptorHeap(&dsvHeapDesc,IID_PPV_ARGS(&dsvHeap));
-
-	////深度ステンシルビューの生成
-	//D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-	//dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
-	//dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	//dev->CreateDepthStencilView(
-	//	depthBuff.Get(),
-	//	&dsvDesc,
-	//	dsvHeap->GetCPUDescriptorHandleForHeapStart());
-
-
 	//頂点シェーダの読み込みとコンパイル(頂点シェーダは頂点の座標変換)
 	result = D3DCompileFromFile(
 		L"Resource/shaders/BasicVS.hlsl",//シェーダーファイル名
@@ -881,6 +837,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	//ゲームループ
 	while (true)
 	{
+
+		fps->FpsControlBegin();
 		if (winApp->ProcessMessage())
 		{
 			//ゲームループを抜ける
@@ -968,74 +926,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 		//描画前処理
 		dxCommon->preDraw();
-		////バックバッファの番号を解除
-		//UINT bbIndex = swapChain->GetCurrentBackBufferIndex();
-
-		//// １．リソースバリアで書き込み可能に変更
-		//D3D12_RESOURCE_BARRIER barrierDesc{};
-		//barrierDesc.Transition.pResource = backBuffers[bbIndex].Get();//バックバッファを指定
-		//barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;//表示状態から
-		//barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;//描画状態へ
-		//commandList->ResourceBarrier(1, &barrierDesc);
-
-		////　２．描画先の変更
-		////レンダーターゲットビューのハンドルを取得
-		//D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
-		//rtvHandle.ptr += bbIndex * dev->GetDescriptorHandleIncrementSize(rtvHeapDesc.Type);
-		//
-		////深度ステンシル用デスクリプタヒープのハンドルを取得
-		//D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
-
-		//commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
-
-		//// ３．画面クリア          R     G     B     A(alpha)
-
-		//commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-		//commandList->ClearDepthStencilView(dsvHandle,D3D12_CLEAR_FLAG_DEPTH,1.0f,0,0,nullptr);
-
-		////　４．ここから描画コマンド
-		////ビューポートの設定コマンド
-		//D3D12_VIEWPORT viewport[4]{};
-
-		//viewport[0].Width = WinApp::window_width;
-		//viewport[0].Height = WinApp::window_height;
-		//viewport[0].TopLeftX = 0;
-		//viewport[0].TopLeftY = 0;
-		//viewport[0].MinDepth = 0.0f;
-		//viewport[0].MaxDepth = 1.0f;
-
-		///*viewport[1].Width = window_width;
-		//viewport[1].Height = window_height;
-		//viewport[1].TopLeftX = -300;
-		//viewport[1].TopLeftY = 200;
-		//viewport[1].MinDepth = 0.0f;
-		//viewport[1].MaxDepth = 1.0f;
-		//viewport[2].Width = window_width;
-		//viewport[2].Height = window_height;
-		//viewport[2].TopLeftX = 200;
-		//viewport[2].TopLeftY = -100;
-		//viewport[2].MinDepth = 0.0f;
-		//viewport[2].MaxDepth = 1.0f;
-		//viewport[3].Width = window_width;
-		//viewport[3].Height = window_height / 2;
-		//viewport[3].TopLeftX = 200;
-		//viewport[3].TopLeftY = 400;
-		//viewport[3].MinDepth = 0.0f;
-		//viewport[3].MaxDepth = 1.0f;*/
-
-
-		////ビューポート設定コマンドを、コマンドリストに積む
-		//commandList->RSSetViewports(1, &viewport[0]);
-
-		////シザー矩形
-		//D3D12_RECT scissorRect{};
-		//scissorRect.left = 0;//切り抜き座標左
-		//scissorRect.right = scissorRect.left + WinApp::window_width;//切り抜き座標右
-		//scissorRect.top = 0;//切り抜き座標上
-		//scissorRect.bottom = scissorRect.top + WinApp::window_height;//切り抜き座標下
-
-		////シザー矩形設定コマンドを、コマンドリストに積む
-		//commandList->RSSetScissorRects(1, &scissorRect);
 
 		//パイプラインステートとルートシグネチャの設定コマンド
 
@@ -1075,64 +965,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 			DrawObject3d(&object3ds[i], dxCommon->GetCommandList(), vbView, ibView, _countof(indices));
 		}
 
-		////0番定数バッファビュー(CBV)の設定コマンド
-		//commandList->SetGraphicsRootConstantBufferView(2, constBuffTransform0->GetGPUVirtualAddress());
-		////0番描画コマンド
-		//commandList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);//全ての頂点を使って描画
-		////1番定数バッファビュー(CBV)の設定コマンド
-		//commandList->SetGraphicsRootConstantBufferView(2, constBuffTransform1->GetGPUVirtualAddress());
-		////1番描画コマンド
-		//commandList->DrawIndexedInstanced(_countof(indices), 1, 0, 0, 0);//全ての頂点を使って描画
-
-		//ビューポート設定コマンドを、コマンドリストに積む
-		//commandList->RSSetViewports(1, &viewport[1]);
-		//commandList->DrawInstanced(_countof(vertices), 1, 0, 0);//全ての頂点を使って描画
-
-		//commandList->RSSetViewports(1, &viewport[2]);
-		//commandList->DrawInstanced(_countof(vertices), 1, 0, 0);//全ての頂点を使って描画
-
-		//commandList->RSSetViewports(1, &viewport[3]);
-		//commandList->DrawInstanced(_countof(vertices), 1, 0, 0);//全ての頂点を使って描画
 		//　４．ここまで描画コマンド
 		dxCommon->postDraw();
-		////　５．リソースバリアを戻す
-		//barrierDesc.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;//描画状態から
-		//barrierDesc.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;//表示状態へ
-		//commandList->ResourceBarrier(1, &barrierDesc);
-
-		////命令のクローズ
-		//result = commandList->Close();
-		//assert(SUCCEEDED(result));
-
-		////コマンドリストの実行
-		//ID3D12CommandList* commandLists[] = { commandList.Get()};
-		//commandQueue->ExecuteCommandLists(1, commandLists);
-
-		////画面に表示するバッファをフリップ (裏表の入れ替え)
-		//result = swapChain->Present(1, 0);
-		//assert(SUCCEEDED(result));
-
-		////コマンドの実行完了を待つ
-		//commandQueue->Signal(fence.Get(), ++fenceVal);
-		//if (fence->GetCompletedValue() != fenceVal)
-		//{
-		//	_Post_ _Notnull_ HANDLE event = CreateEvent(nullptr, false, false, nullptr);
-		//	if (event != 0) {
-		//		fence->SetEventOnCompletion(fenceVal, event);
-		//		WaitForSingleObject(event, INFINITE);
-		//		CloseHandle(event);
-		//	}
-		//}
-
-		////キューをクリア
-		//result = cmdAllocator->Reset();
-		//assert(SUCCEEDED(result));
-		////再びコマンドリストをためる準備
-		//result = commandList->Reset(cmdAllocator.Get(), nullptr);
-		//assert(SUCCEEDED(result));
+		
 
 
-
+		fps->FpsControlEnd();
 		//ここまでDirectX毎フレーム処理
 	}
 	//windowAPIの終了処理
