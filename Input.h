@@ -3,6 +3,8 @@
 
 #define DIRECTINPUT_VERSION  0x0800
 #include <dinput.h>
+
+#include "WinApp.h"
 #include <windows.h>
 #include <wrl.h>
 
@@ -19,7 +21,7 @@ public:
 	/// <summary>
 	/// ‰Šú‰»
 	/// </summary>
-	void Initialize(HINSTANCE hInstance, HWND hwnd);
+	void Initialize(WinApp*winApp);
 
 	/// <summary>
 	/// XV
@@ -29,16 +31,21 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <returns>‰Ÿ‚³‚ê‚Ä‚¢‚é‚©</returns>
+	/// <returns>‰Ÿ‚³‚ê‚Ä‚¢‚é‚©‚Ç‚¤‚©</returns>
 	bool PushKey(BYTE keyNum);
 
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <returns>‰Ÿ‚µ‚½‚©</returns>
+	/// <returns>‰Ÿ‚µ‚½‚©‚Ç‚¤‚©</returns>
 	bool TriggerKey(BYTE keyNum);
 
-	
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="keyNum"></param>
+	/// <returns>—£‚³‚ê‚½‚©‚Ç‚¤‚©</returns>
+	bool ReleaseKey(BYTE keyNum);
 
 	//ƒƒ“ƒo•Ï”
 private:
@@ -52,5 +59,6 @@ private:
 	BYTE keys[256] = {};
 	BYTE oldkeys[256] = {};
 
+	WinApp* winapp_ = nullptr;
 
 };
