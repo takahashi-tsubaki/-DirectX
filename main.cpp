@@ -26,8 +26,6 @@ using namespace Microsoft::WRL;
 #pragma comment(lib,"dinput8.lib")//directInputのバージョン
 #pragma comment(lib,"dxguid.lib")
 
-
-
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG
 	va_list valist;
