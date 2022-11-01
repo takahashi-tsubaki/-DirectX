@@ -262,29 +262,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 	result = dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 
-	////DirectInputの初期化
-	//IDirectInput8* directInput = nullptr;
-	//result = DirectInput8Create(w.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
-	//assert(SUCCEEDED(result));
-
-	////キーボードデバイスの生成
-	//IDirectInputDevice8* keyboard = nullptr;
-	//result = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
-	//assert(SUCCEEDED(result));
-
-	////入力データ形式のセット
-	//result = keyboard->SetDataFormat(&c_dfDIKeyboard);
-	//assert(SUCCEEDED(result));
-
-	////排他制御レベルのセット
-	//result = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	//assert(SUCCEEDED(result));
-	////DISCL_FOREGROUND   画面が手前にある場合のみ入力を受け付ける
-	////DISCL_NONEXCLUSIVE デバイスをこのアプリだけで専有しない
-	////DISCL_NOWINKEY     Windowsキーを無効にする
-
-
-
 	//ここまでDirectX初期化処理
 
 	//ここから描画初期化処理
