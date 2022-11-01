@@ -1,12 +1,12 @@
 #include "Input.h"
 
-void Input::Initialize(WinApp* winApp)
+void Input::Initialize(HINSTANCE hInstance,HWND hwnd)
 {
-	this->winapp_ = winApp;
+
 	HRESULT result;
 
 	//DirectInputの初期化
-	result = DirectInput8Create(winapp_->GetInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
+	result = DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput, nullptr);
 	assert(SUCCEEDED(result));
 
 	//キーボードデバイスの生成
@@ -18,7 +18,7 @@ void Input::Initialize(WinApp* winApp)
 	assert(SUCCEEDED(result));
 
 	//排他制御レベルのセット
-	result = keyboard->SetCooperativeLevel(winapp_->Gethwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+	result = keyboard->SetCooperativeLevel(hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(result));
 	//DISCL_FOREGROUND   画面が手前にある場合のみ入力を受け付ける
 	//DISCL_NONEXCLUSIVE デバイスをこのアプリだけで専有しない
@@ -55,17 +55,6 @@ bool Input::TriggerKey(BYTE keyNum)
 {
 	// 指定キーを押された瞬間にtrueを返す
 	if (!oldkeys[keyNum] && keys[keyNum] )
-	{
-		return true;
-	}
-	// そうでなければfalseを返す
-	return false;
-}
-
-bool Input::ReleaseKey(BYTE keyNum)
-{
-	// 指定キーを離されているた時にtrueを返す
-	if (oldkeys[keyNum] && !keys[keyNum])
 	{
 		return true;
 	}
