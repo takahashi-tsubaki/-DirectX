@@ -43,6 +43,9 @@ private:
 
 	WinApp* winApp = nullptr;
 
+	
+	static DirectXCommon* dxCommon_;
+
 public:
 	void Initialize(WinApp*winApp);
 	void InitializeDevice();
@@ -59,5 +62,6 @@ public:
 	//Getter
 	ID3D12Device* GetDevice()const { return dev.Get(); }
 	ID3D12GraphicsCommandList* GetCommandList()const { return commandList.Get(); }
+	static DirectXCommon* GetInstance();
 };
 
