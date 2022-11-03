@@ -132,7 +132,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	//アダプターの列挙用
 	std::vector<ComPtr<IDXGIAdapter4>> adapters;
 
-
 	//ここに特定の名前を持つアダプターオブジェクトが入る
 	ComPtr<IDXGIAdapter4> tmpAdapter;
 
@@ -161,7 +160,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 			break;
 		}
 	}
-
 
 	//対応レベルの取得
 	D3D_FEATURE_LEVEL levels[] =
