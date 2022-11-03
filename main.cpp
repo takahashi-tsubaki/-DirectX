@@ -125,8 +125,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	ComPtr<ID3D12CommandQueue>commandQueue;
 	ID3D12DescriptorHeap* rtvHeap;
 
-	
-
 	//DXGIファクトリーの生成
 	result = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 	assert(SUCCEEDED(result));
