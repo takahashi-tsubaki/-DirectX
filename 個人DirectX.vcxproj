@@ -145,6 +145,7 @@
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Core\DirectXCommon.cpp" />
     <ClCompile Include="Core\FPS.cpp" />
+    <ClCompile Include="Core\TextureManager.cpp" />
     <ClCompile Include="Core\WinApp.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="Core\DirectXCommon.h" />
     <ClInclude Include="Core\ErrorException.h" />
     <ClInclude Include="Core\FPS.h" />
+    <ClInclude Include="Core\TextureManager.h" />
     <ClInclude Include="Core\WinApp.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />
