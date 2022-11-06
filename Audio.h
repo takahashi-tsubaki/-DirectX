@@ -1,5 +1,5 @@
 #pragma once
-#include "ErrorException.h"
+#include "Core/ErrorException.h"
 ///ƒŠƒ“ƒN‚Ìİ’è
 #pragma comment(lib,"xaudio2.lib")
 #pragma comment(lib, "Mf.lib")

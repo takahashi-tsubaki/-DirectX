@@ -143,12 +143,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="DirectXCommon.cpp" />
-    <ClCompile Include="FPS.cpp" />
+    <ClCompile Include="Core\DirectXCommon.cpp" />
+    <ClCompile Include="Core\FPS.cpp" />
+    <ClCompile Include="Core\WinApp.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="WinApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\tsuba\OneDrive\デスクトップ\新しいフォルダー (5)\DirectXTex-feb2022\DirectXTex\DirectXTex_Desktop_2022.vcxproj">
@@ -157,12 +157,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Audio.h" />
-    <ClInclude Include="DirectXCommon.h" />
-    <ClInclude Include="ErrorException.h" />
-    <ClInclude Include="FPS.h" />
+    <ClInclude Include="Core\DirectXCommon.h" />
+    <ClInclude Include="Core\ErrorException.h" />
+    <ClInclude Include="Core\FPS.h" />
+    <ClInclude Include="Core\WinApp.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="WinApp.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\shaders\Basic.hlsli" />

@@ -14,9 +14,9 @@
 #include <DirectXTex.h> 
 
 #include "Input.h"
-#include "WinApp.h"
-#include "DirectXCommon.h"
-#include "FPS.h"
+#include "Core/WinApp.h"
+#include "Core/DirectXCommon.h"
+#include "Core/FPS.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;

@@ -4,7 +4,7 @@
 #define DIRECTINPUT_VERSION  0x0800
 #include <dinput.h>
 
-#include "WinApp.h"
+#include "Core/WinApp.h"
 #include <windows.h>
 #include <wrl.h>
 
