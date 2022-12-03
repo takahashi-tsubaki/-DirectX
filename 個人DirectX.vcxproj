@@ -142,6 +142,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="2D\Sprite.cpp" />
+    <ClCompile Include="2D\SpriteManager.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Core\DirectXCommon.cpp" />
     <ClCompile Include="Core\FPS.cpp" />
@@ -156,6 +158,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="2D\Sprite.h" />
+    <ClInclude Include="2D\SpriteManager.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Core\DirectXCommon.h" />
     <ClInclude Include="Core\ErrorException.h" />

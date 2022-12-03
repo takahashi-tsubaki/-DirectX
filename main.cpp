@@ -1,34 +1,8 @@
-﻿#include <Windows.h>
-#include <tchar.h>
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <cassert>
-#include <vector>
-#include <string>
-#include <DirectXMath.h>
-#include <d3dcompiler.h>
-#define DIRECTINPUT_VERSION  0x0800
-#include <dinput.h>
-#include <wrl.h>
-
-#include <DirectXTex.h> 
-
+﻿
 #include "Input.h"
 #include "Core/WinApp.h"
 #include "Core/DirectXCommon.h"
 #include "Core/FPS.h"
-
-using namespace DirectX;
-using namespace Microsoft::WRL;
-
-//リンクの設定
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib,"dxgi.lib")
-#pragma comment(lib,"d3dcompiler.lib")
-#pragma comment(lib,"dinput8.lib")//directInputのバージョン
-#pragma comment(lib,"dxguid.lib")
-
-
 
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG
