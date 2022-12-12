@@ -1,4 +1,4 @@
-//#include "Sprite.hlsli"
+#include "Sprite.hlsli"
 
 //VSOutput main(float4 pos : POSITION,float3 normal : NORMAL, float2 uv : TEXCOORD)
 //{
@@ -11,8 +11,10 @@
 //	return output;
 //}
 
-//頂点シェーダ
-float4 main(float4 pos : POSITION) : SV_POSITION
+VSOutput main(float4 pos : POSITION, float2 uv : TEXCOORD)
 {
-	return pos;
+	VSOutput output;//ピクセルシェーダに渡す値
+	output.svpos = pos;
+	output.uv = uv;
+	return output;
 }
