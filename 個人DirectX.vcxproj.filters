@@ -88,15 +88,15 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resource\shaders\Basic.hlsli">
+    <None Include="Resources\shaders\Sprite.hlsli">
       <Filter>シェーダーファイル</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resource\shaders\BasicPS.hlsl">
+    <FxCompile Include="Resources\shaders\SpritePS.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
-    <FxCompile Include="Resource\shaders\BasicVS.hlsl">
+    <FxCompile Include="Resources\shaders\SpriteVS.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
   </ItemGroup>
