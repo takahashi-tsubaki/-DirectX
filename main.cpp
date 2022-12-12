@@ -68,6 +68,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		}
 		//ここからDirectX毎フレーム処理
 	
+		spManager->Update();
 		//描画前処理
 		dxCommon->preDraw();
 

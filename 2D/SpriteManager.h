@@ -8,6 +8,11 @@ private:
 	{
 		XMFLOAT4 color;//色
 	};
+	//定数バッファ用データ構造体(3D変換行列)
+	struct ConstBufferDataTransform
+	{
+		XMMATRIX mat;//3D変換行列
+	};
 	//頂点データ構造体
 	struct Vertex
 	{
@@ -35,6 +40,10 @@ private:
 	//定数バッファの生成
 	ID3D12Resource* constBuffMaterial = nullptr;
 
+	ID3D12Resource* constBuffTransform = nullptr;
+	//定数バッファのマッピング用ポインタ
+	ConstBufferDataTransform* constMapTransform = nullptr;
+
 	//設定を元にSRV用デスクリプタヒープを生成
 	ID3D12DescriptorHeap* srvHeap = nullptr;
 
@@ -50,6 +59,17 @@ private:
 	ID3D12GraphicsCommandList* sCommandList;
 
 	DirectXCommon* dxCommon_ = nullptr;
+
+	//射影変換行列
+	XMMATRIX matProjection;
+	//ワールド変換行列
+	XMMATRIX matWorld;
+	//回転行列
+	XMMATRIX matRot;
+	//平行移動行列
+	XMMATRIX matTrans;
+	float rota ;
+	XMFLOAT3 position;
 
 public:
 	void Initialize(DirectXCommon*dxCommon);

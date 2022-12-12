@@ -1,15 +1,15 @@
 #include "SpriteManager.h"
-
+#include "../Core/WinApp.h"
 void SpriteManager::Initialize(DirectXCommon* dxCommon)
 {
 	HRESULT result;
 	dxCommon_ = dxCommon;
 
 	//頂点データの座標    x       y       z      u   v
-	vertices[0] = { { -0.5f, -0.5f, 0.0f }, {0.0f,1.0f} };//左下
-	vertices[1] = { { +0.5f, -0.5f, 0.0f }, {0.0f,0.0f} };//右下
-	vertices[2] = { { -0.5f, +0.5f, 0.0f }, {1.0f,1.0f} };//左上
-	vertices[3] = { { +0.5f, +0.5f, 0.0f }, {1.0f,0.0f} };//右上
+	vertices[0] = { { 0.0f, 100.0f, 0.0f }, {0.0f,1.0f} };//左下
+	vertices[1] = { { 0.0f, 0.0f, 0.0f }, {0.0f,0.0f} };//右下
+	vertices[2] = { { 100.0f, 100.0f, 0.0f }, {1.0f,1.0f} };//左上
+	vertices[3] = { { 100.0f, 0.0f, 0.0f }, {1.0f,0.0f} };//右上
 
 	////頂点データの座標    x       y       z      u   v
 	//vertices[0] =  { -0.5f, -0.5f, 0.0f };//左下
@@ -81,6 +81,14 @@ void SpriteManager::Initialize(DirectXCommon* dxCommon)
 	cbResourceDesc.SampleDesc.Count = 1;
 	cbResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
+	//3D変換リソース
+	cbResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	cbResourceDesc.Width = (sizeof(ConstBufferDataTransform) + 0xff) & ~0xff;
+	cbResourceDesc.Height = 1;
+	cbResourceDesc.DepthOrArraySize = 1;
+	cbResourceDesc.MipLevels = 1;
+	cbResourceDesc.SampleDesc.Count = 1;
+	cbResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	//定数バッファの生成
 	result = dxCommon_->GetDevice()->CreateCommittedResource(
@@ -92,13 +100,42 @@ void SpriteManager::Initialize(DirectXCommon* dxCommon)
 		IID_PPV_ARGS(&constBuffMaterial));
 	assert(SUCCEEDED(result));
 
+	//定数バッファの生成(3D)
+	result = dxCommon_->GetDevice()->CreateCommittedResource(
+		&cbHeapProp,//ヒープ設定
+		D3D12_HEAP_FLAG_NONE,
+		&cbResourceDesc,//リソース設定
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&constBuffTransform));
+	assert(SUCCEEDED(result));
+
 	//定数バッファのマッピング
 	ConstBufferDataMaterial* constMapMaterial = nullptr;
 	result = constBuffMaterial->Map(0, nullptr, (void**)&constMapMaterial);
 	assert(SUCCEEDED(result));
 
+
+	result = constBuffTransform->Map(0, nullptr, (void**)&constMapTransform);
+	assert(SUCCEEDED(result));
+
 	//値を書き込むと自動的に転送される
 	constMapMaterial->color = XMFLOAT4(1, 0, 0, 0.5f);
+
+	// 単位行列を代入
+	constMapTransform->mat = XMMatrixIdentity();
+	constMapTransform->mat.r[0].m128_f32[0] = 2.0f / WinApp::window_width;
+	constMapTransform->mat.r[1].m128_f32[1] = -2.0f / WinApp::window_height;
+	constMapTransform->mat.r[3].m128_f32[0] = -1.0f;
+	constMapTransform->mat.r[3].m128_f32[1] = 1.0f;
+	
+#pragma endregion
+
+#pragma region 行列
+
+	
+	 rota = 0.0f;
+	 position = { 0.0f,0.0f,0.0f };
 #pragma endregion
 
 #pragma region テクスチャ関連
@@ -201,7 +238,7 @@ void SpriteManager::Initialize(DirectXCommon* dxCommon)
 #pragma endregion
 
 	//ルートパラメータ
-	D3D12_ROOT_PARAMETER rootParams[2] = {};
+	D3D12_ROOT_PARAMETER rootParams[3] = {};
 	rootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//定数バッファビュー
 	rootParams[0].Descriptor.ShaderRegister = 0;//定数バッファ番号
 	rootParams[0].Descriptor.RegisterSpace = 0;//デフォルト値
@@ -211,6 +248,11 @@ void SpriteManager::Initialize(DirectXCommon* dxCommon)
 	rootParams[1].DescriptorTable.pDescriptorRanges = &descriptorRange;//デスクリプタレンジ
 	rootParams[1].DescriptorTable.NumDescriptorRanges = 1;//デスクリプタレンジ数
 	rootParams[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;//全てのシェーダから見える
+
+	rootParams[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;//定数バッファビュー
+	rootParams[2].Descriptor.ShaderRegister = 1;//定数バッファ番号
+	rootParams[2].Descriptor.RegisterSpace = 0;//デフォルト値
+	rootParams[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;//全てのシェーダから見える
 
 	//テクスチャサンプラーの設定
 	D3D12_STATIC_SAMPLER_DESC samplerDesc{};
@@ -365,6 +407,16 @@ void SpriteManager::Initialize(DirectXCommon* dxCommon)
 void SpriteManager::Update()
 {
 
+	matRot = XMMatrixIdentity();
+	matRot *= XMMatrixRotationZ(rota);
+	matTrans = XMMatrixTranslation(position.x,position.y,position.z);
+	//単位行列の代入
+	matWorld = XMMatrixIdentity();
+	matWorld *= matRot;
+	matWorld *= matTrans;
+
+	//定数バッファへ転送
+	constMapTransform->mat *= matWorld;
 }
 
 void SpriteManager::Draw()
@@ -390,6 +442,9 @@ void SpriteManager::Draw()
 
 	//SRVヒープの先頭にあるSRVをルートパラメータの1番に設定
 	sCommandList->SetGraphicsRootDescriptorTable(1, srvGpuHandle);
+
+	//定数バッファビュー(CBV)の設定コマンド
+	sCommandList->SetGraphicsRootConstantBufferView(2, constBuffTransform->GetGPUVirtualAddress());
 	//描画コマンド
 	sCommandList->DrawInstanced(vertices.size(), 1, 0, 0);//全ての頂点を使って描画
 }
