@@ -4,6 +4,7 @@
 #include "Core/DirectXCommon.h"
 #include "Core/FPS.h"
 
+#include "2D/Sprite.h"
 #include "2D/SpriteManager.h"
 
 
@@ -43,6 +44,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	spManager = new SpriteManager;
 	spManager->Initialize(dxCommon);
 	
+	Sprite* sprite = new Sprite();
+	sprite->Initialize(spManager);
 
 	//ここからDirectX初期化処理
 	

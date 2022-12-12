@@ -6,9 +6,9 @@ void SpriteManager::Initialize(DirectXCommon* dxCommon)
 	dxCommon_ = dxCommon;
 
 	//頂点データの座標
-	vertices[0] = { -0.5f,-0.5f,0.0f };//左下
-	vertices[1] = { -0.5f,+0.5f,0.0f };//左上
-	vertices[2] = { +0.5f,-0.5f,0.0f };//右下
+	vertices[0] = { 1.0f,-0.5f,0.0f };//左下
+	vertices[1] = { 0.0f,+0.5f,0.0f };//左上
+	vertices[2] = { -1.0f,-0.5f,0.0f };//右下
 
 	//頂点データ全体のサイズ = 頂点データ1つ分のサイズ * 頂点の要素数
 	UINT sizeVB = static_cast<UINT>(sizeof(XMFLOAT3) * vertices.size());
