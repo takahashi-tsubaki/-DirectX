@@ -241,17 +241,17 @@ void DirectXCommon::preDraw()
 
 	//　４．ここから描画コマンド
 	//ビューポートの設定コマンド
-	D3D12_VIEWPORT viewport[4]{};
+	D3D12_VIEWPORT viewport{};
 
-	viewport[0].Width = WinApp::window_width;
-	viewport[0].Height = WinApp::window_height;
-	viewport[0].TopLeftX = 0;
-	viewport[0].TopLeftY = 0;
-	viewport[0].MinDepth = 0.0f;
-	viewport[0].MaxDepth = 1.0f;
+	viewport.Width = WinApp::window_width;
+	viewport.Height = WinApp::window_height;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
 
 	//ビューポート設定コマンドを、コマンドリストに積む
-	commandList->RSSetViewports(1, &viewport[0]);
+	commandList->RSSetViewports(1, &viewport);
 
 	//シザー矩形
 	D3D12_RECT scissorRect{};
