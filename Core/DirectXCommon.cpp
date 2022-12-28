@@ -307,11 +307,7 @@ void DirectXCommon::postDraw()
 
 }
 
-//DirectXCommon* DirectXCommon::GetInstance()
-//{
-//	if (dxCommon_ == nullptr)
-//	{
-//		dxCommon_ = new DirectXCommon();
-//	}
-//	return dxCommon_;
-//}
+DirectXCommon* DirectXCommon::GetInstance() {
+	static DirectXCommon instance;
+	return &instance;
+}
