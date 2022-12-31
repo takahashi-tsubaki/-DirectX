@@ -303,8 +303,6 @@ void DirectXCommon::postDraw()
 	result = commandList->Reset(cmdAllocator.Get(), nullptr);
 	assert(SUCCEEDED(result));
 
-
-
 }
 
 DirectXCommon* DirectXCommon::GetInstance() {
