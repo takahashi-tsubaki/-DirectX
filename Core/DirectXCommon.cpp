@@ -303,15 +303,9 @@ void DirectXCommon::postDraw()
 	result = commandList->Reset(cmdAllocator.Get(), nullptr);
 	assert(SUCCEEDED(result));
 
-
-
 }
 
-//DirectXCommon* DirectXCommon::GetInstance()
-//{
-//	if (dxCommon_ == nullptr)
-//	{
-//		dxCommon_ = new DirectXCommon();
-//	}
-//	return dxCommon_;
-//}
+DirectXCommon* DirectXCommon::GetInstance() {
+	static DirectXCommon instance;
+	return &instance;
+}

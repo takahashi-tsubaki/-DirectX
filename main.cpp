@@ -39,18 +39,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	input->Initialize(winApp);
 
 	DirectXCommon* dxCommon = nullptr;
-	dxCommon = new DirectXCommon();
+	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(winApp);
 
 	// 3Dオブジェクト静的初期化
 	Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
-
-	SpriteManager* spManager = nullptr;
-	spManager = new SpriteManager;
-	spManager->Initialize(dxCommon);
-	
-	Sprite* sprite = new Sprite();
-	sprite->Initialize(spManager);
 
 	Object3d* obj3d = nullptr;
 	
@@ -81,7 +74,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		}
 		//ここからDirectX毎フレーム処理
 	
-		spManager->Update();
 		obj3d->Update();
 		obj3d2->Update();
 		//描画前処理
@@ -119,6 +111,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	delete winApp;
 	winApp = nullptr;
 	delete dxCommon;
+	delete obj3d;
+	delete obj3d2;
 	return 0;
 }
 
