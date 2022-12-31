@@ -1,6 +1,7 @@
 #include "../Core/DirectXCommon.h"
+#include "../2D/SpriteManager.h"
+
 #include "Material.h"
-//#include "TextureManager.h"
 #include <DirectXTex.h>
 #include <cassert>
 
@@ -56,7 +57,7 @@ void Material::LoadTexture(const std::string& directoryPath) {
 	string filepath = directoryPath + textureFilename_;
 
 	// テクスチャ読み込み
-	/*textureHandle_ = TextureManager::Load(filepath);*/
+	textureHandle_ = SpriteManager::Load(filepath);
 }
 
 void Material::Update() {
@@ -72,8 +73,8 @@ void Material::SetGraphicsCommand(
 	UINT rooParameterIndexTexture) {
 
 	// SRVをセット
-	/*TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(
-		commandList, rooParameterIndexTexture, textureHandle_);*/
+	SpriteManager::GetInstance()->SetGraphicsRootDescriptorTable(
+		commandList, rooParameterIndexTexture, textureHandle_);
 
 	// マテリアルの定数バッファをセット
 	commandList->SetGraphicsRootConstantBufferView(
@@ -85,8 +86,8 @@ void Material::SetGraphicsCommand(
 	UINT rooParameterIndexTexture, uint32_t textureHandle) {
 
 	// SRVをセット
-	/*TextureManager::GetInstance()->SetGraphicsRootDescriptorTable(
-		commandList, rooParameterIndexTexture, textureHandle);*/
+	SpriteManager::GetInstance()->SetGraphicsRootDescriptorTable(
+		commandList, rooParameterIndexTexture, textureHandle);
 
 	// マテリアルの定数バッファをセット
 	commandList->SetGraphicsRootConstantBufferView(

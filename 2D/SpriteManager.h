@@ -87,9 +87,7 @@ private:
 	// テクスチャコンテナ
 	std::array<Texture, kNumDescriptors> textures_;
 
-	/// <summary>
 	/// 読み込み
-	/// </summary>
-	/// <param name="fileName">ファイル名</param>
+	//ファイル名</param>
 	uint32_t LoadInternal(const std::string& fileName);
 };
