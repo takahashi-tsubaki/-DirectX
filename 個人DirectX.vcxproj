@@ -147,6 +147,7 @@
     <ClCompile Include="3D\Material.cpp" />
     <ClCompile Include="3D\Mesh.cpp" />
     <ClCompile Include="3D\Object3d.cpp" />
+    <ClCompile Include="3D\ViewProjection.cpp" />
     <ClCompile Include="3D\WorldTransform.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Core\DirectXCommon.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="3D\Material.h" />
     <ClInclude Include="3D\Mesh.h" />
     <ClInclude Include="3D\Object3d.h" />
+    <ClInclude Include="3D\ViewProjection.h" />
     <ClInclude Include="3D\WorldTransform.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Core\DirectXCommon.h" />

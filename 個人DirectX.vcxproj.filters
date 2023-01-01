@@ -90,6 +90,9 @@
     <ClCompile Include="3D\WorldTransform.cpp">
       <Filter>ソース ファイル\3D</Filter>
     </ClCompile>
+    <ClCompile Include="3D\ViewProjection.cpp">
+      <Filter>ソース ファイル\3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Input.h">
@@ -138,6 +141,9 @@
       <Filter>ヘッダー ファイル\math</Filter>
     </ClInclude>
     <ClInclude Include="3D\WorldTransform.h">
+      <Filter>ヘッダー ファイル\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="3D\ViewProjection.h">
       <Filter>ヘッダー ファイル\3D</Filter>
     </ClInclude>
   </ItemGroup>
