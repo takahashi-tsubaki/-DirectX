@@ -160,6 +160,8 @@
     <ClCompile Include="math\MyMath.cpp" />
     <ClCompile Include="math\Vector2.cpp" />
     <ClCompile Include="math\Vector3.cpp" />
+    <ClCompile Include="math\Vector4.cpp" />
+    <ClCompile Include="Scene\GameScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\tsuba\OneDrive\デスクトップ\新しいフォルダー (5)\DirectXTex-feb2022\DirectXTex\DirectXTex_Desktop_2022.vcxproj">
@@ -185,6 +187,8 @@
     <ClInclude Include="math\MyMath.h" />
     <ClInclude Include="math\Vector2.h" />
     <ClInclude Include="math\Vector3.h" />
+    <ClInclude Include="math\Vector4.h" />
+    <ClInclude Include="Scene\GameScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\BasicShaderHeader.hlsli" />

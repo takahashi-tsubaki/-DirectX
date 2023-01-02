@@ -1,5 +1,5 @@
 #include "DirectXCommon.h"
-
+#include <d3dx12.h>
 void DirectXCommon::Initialize(WinApp* winApp)
 {
 	assert(winApp);
@@ -303,6 +303,14 @@ void DirectXCommon::postDraw()
 	result = commandList->Reset(cmdAllocator.Get(), nullptr);
 	assert(SUCCEEDED(result));
 
+}
+
+void DirectXCommon::ClearDepthBuffer() {
+	// 深度ステンシルビュー用デスクリプタヒープのハンドルを取得
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvH =
+		CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvHeap->GetCPUDescriptorHandleForHeapStart());
+	// 深度バッファのクリア
+	commandList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 DirectXCommon* DirectXCommon::GetInstance() {

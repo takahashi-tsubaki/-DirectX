@@ -52,6 +52,9 @@ public:
 	void InitializeDeaphBuffer();
 	void InitializeFence();
 
+	void ClearDepthBuffer();
+
+
 	//•`‰æŠÖ˜A
 	void preDraw();
 	void postDraw();

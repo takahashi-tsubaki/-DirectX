@@ -9,6 +9,8 @@
 
 #include"3D/Object3d.h"
 
+#include "Scene/GameScene.h"
+
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG
 	va_list valist;
@@ -42,8 +44,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(winApp);
 
-	// 3Dオブジェクト静的初期化
+	// 静的初期化
 	Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
+	/*Sprite::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);*/
+	Model::StaticInitialize();
 
 	Object3d* obj3d = nullptr;
 	
@@ -53,6 +57,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	obj3d2 = Object3d::Create();
 	obj3d2->SetPosition({30,0,0});
 	
+	
+
+	GameScene* gameScene_ = nullptr;
+	gameScene_ = new GameScene();
+	gameScene_->Initialize();
 	//ここからDirectX初期化処理
 	
 
@@ -76,6 +85,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	
 		obj3d->Update();
 		obj3d2->Update();
+		gameScene_->Update();
 		//描画前処理
 		dxCommon->preDraw();
 
@@ -88,6 +98,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		// 3Dオブクジェクトの描画
 		obj3d->Draw();
 		obj3d2->Draw();
+		gameScene_->Draw();
 		/// <summary>
 		/// ここに3Dオブジェクトの描画処理を追加できる
 		/// </summary>
@@ -110,7 +121,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	delete input;
 	delete winApp;
 	winApp = nullptr;
-	delete dxCommon;
+	/*delete dxCommon;*/
 	delete obj3d;
 	delete obj3d2;
 	return 0;
