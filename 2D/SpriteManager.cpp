@@ -112,6 +112,7 @@ uint32_t SpriteManager::LoadInternal(const std::string& fileName)
 	result = LoadFromWICFile(wfilePath, WIC_FLAGS_NONE, &metadata, scratchImg);
 	assert(SUCCEEDED(result));
 
+
 	ScratchImage mipChain{};
 	// ミップマップ生成
 	result = GenerateMipMaps(
