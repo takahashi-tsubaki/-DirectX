@@ -24,13 +24,13 @@ void GameScene::Draw() {
 
 #pragma region 背景スプライト描画
 	// 背景スプライト描画前処理
-	//Sprite::PreDraw(commandList);
+	Sprite::PreDraw(commandList);
 
 	// 背景スプライトの描画処理
 
 
 	// スプライト描画後処理
-	/*Sprite::PostDraw();*/
+	Sprite::PostDraw();
 	// 深度バッファクリア
 	dxCommon_->ClearDepthBuffer();
 #pragma endregion
@@ -49,7 +49,7 @@ void GameScene::Draw() {
 
 #pragma region 前景スプライト描画
 	// 前景スプライト描画前処理
-	/*Sprite::PreDraw(commandList);*/
+	Sprite::PreDraw(commandList);
 
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
@@ -58,7 +58,7 @@ void GameScene::Draw() {
 
 	//
 	// スプライト描画後処理
-	/*Sprite::PostDraw();*/
+	Sprite::PostDraw();
 
 #pragma endregion
 }

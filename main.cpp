@@ -31,7 +31,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	
 	//FPS
 	FPS* fps = new FPS;
-
+	fps->SetFrameRate(60);
 	WinApp* winApp = nullptr;
 	winApp = new WinApp();
 	winApp->Initialize();
@@ -44,9 +44,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(winApp);
 
+
+	SpriteManager::GetInstance()->Initialize(dxCommon->GetDevice());
+	SpriteManager::Load("tex1.png");
 	// 静的初期化
 	Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
-	/*Sprite::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);*/
+	Sprite::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
 	Model::StaticInitialize();
 
 	Object3d* obj3d = nullptr;
