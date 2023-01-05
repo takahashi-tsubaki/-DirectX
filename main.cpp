@@ -80,7 +80,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		dxCommon->preDraw();
 
 
-		spManager->Draw();
+		/*spManager->Draw();*/
 #pragma region 3Dオブジェクト描画
 // 3Dオブジェクト描画前処理
 		Object3d::PreDraw(dxCommon->GetCommandList());
