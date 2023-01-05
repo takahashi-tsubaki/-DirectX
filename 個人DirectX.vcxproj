@@ -144,13 +144,22 @@
   <ItemGroup>
     <ClCompile Include="2D\Sprite.cpp" />
     <ClCompile Include="2D\SpriteManager.cpp" />
+    <ClCompile Include="3D\Material.cpp" />
+    <ClCompile Include="3D\Mesh.cpp" />
+    <ClCompile Include="3D\Model.cpp" />
+    <ClCompile Include="3D\Object3d.cpp" />
+    <ClCompile Include="3D\ViewProjection.cpp" />
+    <ClCompile Include="3D\WorldTransform.cpp" />
     <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Core\DirectXCommon.cpp" />
     <ClCompile Include="Core\FPS.cpp" />
     <ClCompile Include="Core\WinApp.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="math\Matrix4.cpp" />
+    <ClCompile Include="math\MyMath.cpp" />
+    <ClCompile Include="math\Vector2.cpp" />
+    <ClCompile Include="math\Vector3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\tsuba\OneDrive\デスクトップ\新しいフォルダー (5)\DirectXTex-feb2022\DirectXTex\DirectXTex_Desktop_2022.vcxproj">
@@ -160,18 +169,40 @@
   <ItemGroup>
     <ClInclude Include="2D\Sprite.h" />
     <ClInclude Include="2D\SpriteManager.h" />
+    <ClInclude Include="3D\Material.h" />
+    <ClInclude Include="3D\Mesh.h" />
+    <ClInclude Include="3D\Model.h" />
+    <ClInclude Include="3D\Object3d.h" />
+    <ClInclude Include="3D\ViewProjection.h" />
+    <ClInclude Include="3D\WorldTransform.h" />
     <ClInclude Include="Audio.h" />
     <ClInclude Include="Core\DirectXCommon.h" />
     <ClInclude Include="Core\ErrorException.h" />
     <ClInclude Include="Core\FPS.h" />
     <ClInclude Include="Core\WinApp.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="math\Matrix4.h" />
+    <ClInclude Include="math\MyMath.h" />
+    <ClInclude Include="math\Vector2.h" />
+    <ClInclude Include="math\Vector3.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\shaders\BasicShaderHeader.hlsli" />
     <None Include="Resources\shaders\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Resources\shaders\BasicPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\BasicVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Resources\shaders\SpritePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>

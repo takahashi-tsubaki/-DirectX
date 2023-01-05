@@ -25,6 +25,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 {
 	OutputDebugStringA("Hello DirectX!!\n");
 	
+	
 	//FPS
 	FPS* fps = new FPS;
 
@@ -37,16 +38,18 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	input->Initialize(winApp);
 
 	DirectXCommon* dxCommon = nullptr;
-	dxCommon = new DirectXCommon();
+	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(winApp);
 
-	SpriteManager* spManager = nullptr;
-	spManager = new SpriteManager;
-	spManager->Initialize(dxCommon);
-	
-	Sprite* sprite = new Sprite();
-	sprite->Initialize(spManager);
 
+	Object3d* obj3d = nullptr;
+	
+	obj3d = Object3d::Create();
+
+	Object3d* obj3d2 = nullptr;
+	obj3d2 = Object3d::Create();
+	obj3d2->SetPosition({30,0,0});
+	
 	//ここからDirectX初期化処理
 	
 
@@ -68,15 +71,18 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		}
 		//ここからDirectX毎フレーム処理
 	
-		spManager->Update();
+		obj3d->Update();
+		obj3d2->Update();
 		//描画前処理
 		dxCommon->preDraw();
 
 		//描画処理
 		spManager->Draw();
 
+
 		//描画後処理
 		dxCommon->postDraw();
+
 
 		fps->FpsControlEnd();
 		//ここまでDirectX毎フレーム処理
@@ -88,6 +94,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	delete winApp;
 	winApp = nullptr;
 	delete dxCommon;
+	delete obj3d;
+	delete obj3d2;
 	return 0;
 }
 
