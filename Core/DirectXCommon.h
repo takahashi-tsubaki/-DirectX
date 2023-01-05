@@ -43,9 +43,6 @@ private:
 
 	WinApp* winApp = nullptr;
 
-	
-	static DirectXCommon* dxCommon_;
-
 public:
 	void Initialize(WinApp*winApp);
 	void InitializeDevice();
