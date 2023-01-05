@@ -72,12 +72,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		//描画前処理
 		dxCommon->preDraw();
 
+		//描画処理
 		spManager->Draw();
 
-		//　４．ここまで描画コマンド
+		//描画後処理
 		dxCommon->postDraw();
-		
-
 
 		fps->FpsControlEnd();
 		//ここまでDirectX毎フレーム処理
