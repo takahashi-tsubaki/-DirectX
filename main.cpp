@@ -7,7 +7,7 @@
 #include "2D/Sprite.h"
 #include "2D/SpriteManager.h"
 
-#include"3D/Object3d.h"
+#include "3D/Object3d.h"
 
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG
@@ -42,15 +42,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	dxCommon = new DirectXCommon();
 	dxCommon->Initialize(winApp);
 
-	// 3Dオブジェクト静的初期化
-	Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
-
-	SpriteManager* spManager = nullptr;
-	spManager = new SpriteManager;
-	spManager->Initialize(dxCommon);
-	
-	Sprite* sprite = new Sprite();
-	sprite->Initialize(spManager);
+	Object3d::StaticInitialize(dxCommon->GetDevice(),WinApp::window_width,WinApp::window_height);
 
 	Object3d* obj3d = nullptr;
 	
@@ -81,7 +73,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		}
 		//ここからDirectX毎フレーム処理
 	
-		spManager->Update();
+	/*	spManager->Update();*/
 		obj3d->Update();
 		obj3d2->Update();
 		//描画前処理
