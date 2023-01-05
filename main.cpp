@@ -7,7 +7,6 @@
 #include "2D/Sprite.h"
 #include "2D/SpriteManager.h"
 
-#include"3D/Object3d.h"
 
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG
@@ -42,8 +41,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(winApp);
 
-	// 3Dオブジェクト静的初期化
-	Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
 
 	Object3d* obj3d = nullptr;
 	
@@ -79,26 +76,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		//描画前処理
 		dxCommon->preDraw();
 
+		//描画処理
+		spManager->Draw();
 
-		/*spManager->Draw();*/
-#pragma region 3Dオブジェクト描画
-// 3Dオブジェクト描画前処理
-		Object3d::PreDraw(dxCommon->GetCommandList());
 
-		// 3Dオブクジェクトの描画
-		obj3d->Draw();
-		obj3d2->Draw();
-		/// <summary>
-		/// ここに3Dオブジェクトの描画処理を追加できる
-		/// </summary>
-
-		// 3Dオブジェクト描画後処理
-		Object3d::PostDraw();
-#pragma endregion
-
-		//　４．ここまで描画コマンド
+		//描画後処理
 		dxCommon->postDraw();
-
 
 
 		fps->FpsControlEnd();
