@@ -41,8 +41,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	dxCommon->Initialize(winApp);
 
 	SpriteManager* spManager = nullptr;
-	spManager = new SpriteManager;
+	spManager = SpriteManager::GetInstance();
 	spManager->Initialize(dxCommon);
+
+	Sprite* sprite = nullptr;
+	sprite = new Sprite();
+	sprite->Initialize(spManager);
+
+	/*sprite->SetPosition({0.1f,0.1f});*/
 
 	/*Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
 
@@ -83,7 +89,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		dxCommon->preDraw();
 
 		//描画処理
-		spManager->Draw();
+		sprite->Draw();
 		//描画後処理
 		dxCommon->postDraw();
 
@@ -96,10 +102,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	//入力解放
 	delete input;
 	delete winApp;
-	winApp = nullptr;
-	delete dxCommon;
-	/*delete obj3d;
-	delete obj3d2;*/
+	/*delete dxCommon;*/
+	/*delete spManager;
+	delete sprite;*/
+
+	//input = nullptr;
+	//winApp = nullptr;
+	/*dxCommon = nullptr;*/
+	//spManager = nullptr;
+	//sprite = nullptr;
+	///*delete obj3d;
+	//delete obj3d2;*/
 	return 0;
 }
 
