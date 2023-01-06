@@ -50,15 +50,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 	/*sprite->SetPosition({0.1f,0.1f});*/
 
-	/*Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
-
-	Object3d* obj3d = nullptr;
-
-	obj3d = Object3d::Create();
-
-	Object3d* obj3d2 = nullptr;
-	obj3d2 = Object3d::Create();
-	obj3d2->SetPosition({ 30,0,0 });*/
 
 	//ここからDirectX初期化処理
 
@@ -83,12 +74,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 		spManager->Update();
 
-		/*obj3d->Update();
-		obj3d2->Update();*/
 		//描画前処理
 		dxCommon->preDraw();
 
 		//描画処理
+
 		sprite->Draw();
 		//描画後処理
 		dxCommon->postDraw();
