@@ -4,6 +4,7 @@ class Sprite
 {
 private:
 
+	ID3D12GraphicsCommandList* sCommandList_ = nullptr;
 
 	SpriteManager* spManager_ = nullptr;
 public:
