@@ -72,6 +72,11 @@ private:
 	XMFLOAT3 position;
 
 public:
+
+	uint32_t Load(const std::string& fileName);
+
+	static SpriteManager* GetInstance();
+
 	void Initialize(DirectXCommon* dxCommon);
 
 	void Update();

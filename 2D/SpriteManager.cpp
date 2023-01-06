@@ -1,5 +1,10 @@
 #include "SpriteManager.h"
 #include "../Core/WinApp.h"
+SpriteManager* SpriteManager::GetInstance()
+{
+	static SpriteManager instance;
+	return &instance;
+}
 void SpriteManager::Initialize(DirectXCommon* dxCommon)
 {
 	HRESULT result;

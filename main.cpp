@@ -44,7 +44,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	spManager = new SpriteManager;
 	spManager->Initialize(dxCommon);
 
-	Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
+	/*Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
 
 	Object3d* obj3d = nullptr;
 
@@ -52,7 +52,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 	Object3d* obj3d2 = nullptr;
 	obj3d2 = Object3d::Create();
-	obj3d2->SetPosition({ 30,0,0 });
+	obj3d2->SetPosition({ 30,0,0 });*/
 
 	//ここからDirectX初期化処理
 
@@ -77,14 +77,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 		spManager->Update();
 
-		obj3d->Update();
-		obj3d2->Update();
+		/*obj3d->Update();
+		obj3d2->Update();*/
 		//描画前処理
 		dxCommon->preDraw();
 
 		//描画処理
 		spManager->Draw();
-
 		//描画後処理
 		dxCommon->postDraw();
 
@@ -99,8 +98,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	delete winApp;
 	winApp = nullptr;
 	delete dxCommon;
-	delete obj3d;
-	delete obj3d2;
+	/*delete obj3d;
+	delete obj3d2;*/
 	return 0;
 }
 
