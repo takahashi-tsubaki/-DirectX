@@ -1,5 +1,4 @@
-﻿
-#include "Input.h"
+﻿#include "Input.h"
 #include "Core/WinApp.h"
 #include "Core/DirectXCommon.h"
 #include "Core/FPS.h"
@@ -7,6 +6,7 @@
 #include "2D/Sprite.h"
 #include "2D/SpriteManager.h"
 
+#include "3D/Object3d.h"
 
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG
@@ -20,12 +20,11 @@ void DebugOutputFormatString(const char* format, ...) {
 //関数のプロトタイプ宣言
 LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
-
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 {
 	OutputDebugStringA("Hello DirectX!!\n");
-	
-	
+
+
 	//FPS
 	FPS* fps = new FPS;
 
@@ -41,17 +40,22 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(winApp);
 
+	SpriteManager* spManager = nullptr;
+	spManager = new SpriteManager;
+	spManager->Initialize(dxCommon);
+
+	Object3d::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
 
 	Object3d* obj3d = nullptr;
-	
+
 	obj3d = Object3d::Create();
 
 	Object3d* obj3d2 = nullptr;
 	obj3d2 = Object3d::Create();
-	obj3d2->SetPosition({30,0,0});
-	
+	obj3d2->SetPosition({ 30,0,0 });
+
 	//ここからDirectX初期化処理
-	
+
 
 	//ここから描画初期化処理
 
@@ -70,7 +74,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 			break;
 		}
 		//ここからDirectX毎フレーム処理
-	
+
+		spManager->Update();
+
 		obj3d->Update();
 		obj3d2->Update();
 		//描画前処理
@@ -78,7 +84,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 		//描画処理
 		spManager->Draw();
-
 
 		//描画後処理
 		dxCommon->postDraw();

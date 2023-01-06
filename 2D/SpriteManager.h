@@ -1,93 +1,80 @@
 #pragma once
-
-#include <array>
-#include <d3dx12.h>
-#include <string>
-#include <unordered_map>
-#include <wrl.h>
-
-/// <summary>
-/// スプライトマネージャ
-/// </summary>
-class SpriteManager {
-public:
-	// デスクリプターの数
-	static const size_t kNumDescriptors = 256;
-
-	/// <summary>
-	/// テクスチャ
-	/// </summary>
-	struct Texture {
-		// テクスチャリソース
-		Microsoft::WRL::ComPtr<ID3D12Resource> resource;
-		// シェーダリソースビューのハンドル(CPU)
-		CD3DX12_CPU_DESCRIPTOR_HANDLE cpuDescHandleSRV;
-		// シェーダリソースビューのハンドル(CPU)
-		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuDescHandleSRV;
-		// 名前
-		std::string name;
+#include "../Core/DirectXCommon.h"
+class SpriteManager
+{
+private:
+	//定数バッファ用データ構造体
+	struct ConstBufferDataMaterial
+	{
+		XMFLOAT4 color;//色
+	};
+	//定数バッファ用データ構造体(3D変換行列)
+	struct ConstBufferDataTransform
+	{
+		XMMATRIX mat;//3D変換行列
+	};
+	//頂点データ構造体
+	struct Vertex
+	{
+		XMFLOAT3 pos;//xyz座標
+		XMFLOAT2 uv;//uv座標
 	};
 
-	/// <summary>
-	/// 読み込み
-	/// </summary>
-	/// <param name="fileName">ファイル名</param>
-	/// <returns>テクスチャハンドル</returns>
-	static uint32_t Load(const std::string& fileName);
+	static const int vertexCount = 4;
 
-	/// <summary>
-	/// シングルトンインスタンスの取得
-	/// </summary>
-	/// <returns>シングルトンインスタンス</returns>
-	static SpriteManager* GetInstance();
+	//頂点データ
+	std::array<Vertex, vertexCount> vertices;
 
-	/// <summary>
-	/// システム初期化
-	/// </summary>
-	/// <param name="device">デバイス</param>
-	void Initialize(ID3D12Device* device, std::string directoryPath = "Resources/");
+	//横方向ピクセル数
+	const size_t textureWidth = 256;
+	//縦方向ピクセル数
+	const size_t textureHeight = 256;
+	//配列の要素数
+	const size_t imageDataCount = textureWidth * textureHeight;
+	//画像イメージデータ配列
+	XMFLOAT4* imageData = new XMFLOAT4[imageDataCount];
 
-	/// <summary>
-	/// 全テクスチャリセット
-	/// </summary>
-	void ResetAll();
+	//頂点バッファービューの作成
+	D3D12_VERTEX_BUFFER_VIEW vbView{};
 
-	/// <summary>
-	/// リソース情報取得
-	/// </summary>
-	/// <param name="textureHandle">テクスチャハンドル</param>
-	/// <returns>リソース情報</returns>
-	const D3D12_RESOURCE_DESC GetResoureDesc(uint32_t textureHandle);
+	//定数バッファの生成
+	ID3D12Resource* constBuffMaterial = nullptr;
 
-	/// <summary>
-	/// デスクリプタテーブルをセット
-	/// </summary>
-	/// <param name="commandList">コマンドリスト</param>
-	/// <param name="rootParamIndex">ルートパラメータ番号</param>
-	/// <param name="textureHandle">テクスチャハンドル</param>
-	void SetGraphicsRootDescriptorTable(
-		ID3D12GraphicsCommandList* commandList, UINT rootParamIndex, uint32_t textureHandle);
+	ID3D12Resource* constBuffTransform = nullptr;
+	//定数バッファのマッピング用ポインタ
+	ConstBufferDataTransform* constMapTransform = nullptr;
 
-private:
-	SpriteManager() = default;
-	~SpriteManager() = default;
-	SpriteManager(const SpriteManager&) = delete;
-	SpriteManager& operator=(const SpriteManager&) = delete;
+	//設定を元にSRV用デスクリプタヒープを生成
+	ID3D12DescriptorHeap* srvHeap = nullptr;
 
-	// デバイス
-	ID3D12Device* device_;
-	// デスクリプタサイズ
-	UINT sDescriptorHandleIncrementSize_ = 0u;
-	// ディレクトリパス
-	std::string directoryPath_;
-	// デスクリプタヒープ
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> descriptorHeap_;
-	// 次に使うデスクリプタヒープの番号
-	uint32_t indexNextDescriptorHeap_ = 0u;
-	// テクスチャコンテナ
-	std::array<Texture, kNumDescriptors> textures_;
+	//ルートシグネチャ
+	ID3D12RootSignature* rootSignature;
+	//パイプラインステート
+	ID3D12PipelineState* pipelineState = nullptr;
 
-	/// 読み込み
-	//ファイル名</param>
-	uint32_t LoadInternal(const std::string& fileName);
+	//SRVヒープの先頭ハンドルを取得
+	D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle;
+
+	//スプライト用コマンドリスト
+	ID3D12GraphicsCommandList* sCommandList;
+
+	DirectXCommon* dxCommon_ = nullptr;
+
+	//射影変換行列
+	XMMATRIX matProjection;
+	//ワールド変換行列
+	XMMATRIX matWorld;
+	//回転行列
+	XMMATRIX matRot;
+	//平行移動行列
+	XMMATRIX matTrans;
+	float rota;
+	XMFLOAT3 position;
+
+public:
+	void Initialize(DirectXCommon* dxCommon);
+
+	void Update();
+
+	void Draw();
 };
