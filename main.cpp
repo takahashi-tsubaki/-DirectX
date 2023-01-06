@@ -38,7 +38,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	input->Initialize(winApp);
 
 	DirectXCommon* dxCommon = nullptr;
-	dxCommon = new DirectXCommon();
+	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(winApp);
 
 	Object3d::StaticInitialize(dxCommon->GetDevice(),WinApp::window_width,WinApp::window_height);
@@ -73,31 +73,18 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		//ここからDirectX毎フレーム処理
 	
 	/*	spManager->Update();*/
+
 		obj3d->Update();
 		obj3d2->Update();
 		//描画前処理
 		dxCommon->preDraw();
 
+		//描画処理
+		spManager->Draw();
 
-		/*spManager->Draw();*/
-#pragma region 3Dオブジェクト描画
-// 3Dオブジェクト描画前処理
-		Object3d::PreDraw(dxCommon->GetCommandList());
 
-		// 3Dオブクジェクトの描画
-		obj3d->Draw();
-		obj3d2->Draw();
-		/// <summary>
-		/// ここに3Dオブジェクトの描画処理を追加できる
-		/// </summary>
-
-		// 3Dオブジェクト描画後処理
-		Object3d::PostDraw();
-#pragma endregion
-
-		//　４．ここまで描画コマンド
+		//描画後処理
 		dxCommon->postDraw();
-
 
 
 		fps->FpsControlEnd();
@@ -110,6 +97,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	delete winApp;
 	winApp = nullptr;
 	delete dxCommon;
+	delete obj3d;
+	delete obj3d2;
 	return 0;
 }
 
