@@ -7,6 +7,8 @@
 #include "2D/SpriteManager.h"
 
 #include "3D/Object3d.h"
+#include "3D/Model.h"
+#include "3D/Camera.h"
 
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG
@@ -44,9 +46,57 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	spManager = SpriteManager::GetInstance();
 	spManager->Initialize(dxCommon);
 
+
+
+	//情的初期化
+	Sprite::StaticInitialize(dxCommon->GetDevice(),WinApp::window_width,WinApp::window_height);
+
+	// 3Dオブジェクト静的初期化
+	Object3d::StaticInitialize(dxCommon->GetDevice());
+
+	//ライト情的初期化
+	Light::StaticInitalize(dxCommon->GetDevice());
+
 	Sprite* sprite = nullptr;
-	sprite = new Sprite();
-	sprite->Initialize(spManager);
+
+	Sprite::LoadTexture(1, L"Resources/kuribo-.jpg");
+
+	sprite = Sprite::Create(1,{0.0f,0.0f});
+
+	Model* model = nullptr;
+	Object3d* objModel = nullptr;
+
+	Model* enemymModel = nullptr;
+	Object3d* objEnemy = nullptr;
+
+	objModel = Object3d::Create();
+	model = Model::CreateFromOBJ("skydome");
+
+	objEnemy = Object3d::Create();
+	enemymModel = Model::CreateFromOBJ("enemy");
+
+	objModel->SetModel(model);
+
+	objEnemy->SetModel(enemymModel);
+
+	Light* light = nullptr;
+	//ライト生成
+	light = Light::Create();
+	//ライト色を設定
+	light->SetLightColor({ 1,1,1 });
+	//3Dオブジェクトにライトをセット
+	Object3d::SetLight(light);
+
+	Camera* camera = nullptr;
+
+	camera = new Camera(WinApp::window_width,WinApp::window_height);
+	// カメラ注視点をセット
+	camera->SetTarget({ 0, 1, 0 });
+
+	// 3Dオブジェクトにカメラをセット
+	Object3d::SetCamera(camera);
+	/*sprite->SetSize({ 1.0f,1.0f });*/
+
 
 	/*sprite->SetPosition({0.1f,0.1f});*/
 
@@ -74,12 +124,44 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 		spManager->Update();
 
+		camera->Update();
+
+		objModel->Update();
+		objEnemy->Update();
+		light->Update();
+
 		//描画前処理
 		dxCommon->preDraw();
 
 		//描画処理
-
+#pragma region 背景スプライト描画
+// 背景スプライト描画前処理
+		Sprite::PreDraw(dxCommon->GetCommandList());
+		// 背景スプライト描画
+		/*spriteBG->Draw();*/
 		sprite->Draw();
+		/// <summary>
+		/// ここに背景スプライトの描画処理を追加できる
+		/// </summary>
+
+		// スプライト描画後処理
+		Sprite::PostDraw();
+#pragma endregion
+		
+#pragma region 3Dオブジェクト描画
+		// 3Dオブジェクト描画前処理
+		Object3d::PreDraw(dxCommon->GetCommandList());
+
+		// 3Dオブクジェクトの描画
+		objModel->Draw();
+		objEnemy->Draw();
+		/// <summary>
+		/// ここに3Dオブジェクトの描画処理を追加できる
+		/// </summary>
+
+		// 3Dオブジェクト描画後処理
+		Object3d::PostDraw();
+#pragma endregion
 		//描画後処理
 		dxCommon->postDraw();
 
