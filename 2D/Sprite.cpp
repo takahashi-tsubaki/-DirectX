@@ -9,9 +9,6 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-/// <summary>
-/// 静的メンバ変数の実体
-/// </summary>
 ID3D12Device* Sprite::device = nullptr;
 UINT Sprite::descriptorHandleIncrementSize;
 ID3D12GraphicsCommandList* Sprite::cmdList = nullptr;
@@ -38,11 +35,11 @@ void Sprite::StaticInitialize(ID3D12Device* device, int window_width, int window
 
 	// 頂点シェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		L"Resources/Shaders/SpriteVS.hlsl",	// シェーダファイル名
+		L"Resources/Shaders/SpriteVS.hlsl",
 		nullptr,
-		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
-		"main", "vs_5_0",	// エントリーポイント名、シェーダーモデル指定
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		"main", "vs_5_0",
+		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION,
 		0,
 		&vsBlob, &errorBlob);
 	if (FAILED(result)) {

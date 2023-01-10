@@ -10,6 +10,8 @@
 #include "3D/Model.h"
 #include "3D/Camera.h"
 
+#include "Audio.h"
+
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG
 	va_list valist;
@@ -46,7 +48,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	spManager = SpriteManager::GetInstance();
 	spManager->Initialize(dxCommon);
 
+	Audio* audio = nullptr;
+	audio = new Audio();
+	audio->Initialize();
 
+	audio->LoadWave("se_amd06.wav");
+	
 
 	//情的初期化
 	Sprite::StaticInitialize(dxCommon->GetDevice(),WinApp::window_width,WinApp::window_height);
@@ -124,6 +131,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		}
 		//ここからDirectX毎フレーム処理
 
+		input->Update();
+
 		spManager->Update();
 
 		camera->Update();
@@ -131,6 +140,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		objModel->Update();
 		objEnemy->Update();
 		light->Update();
+
+		if (input->TriggerKey(DIK_SPACE)) {
+			audio->PlayWave("se_amd06.wav");
+		}
 
 		//描画前処理
 		dxCommon->preDraw();
@@ -176,6 +189,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	//入力解放
 	delete input;
 	delete winApp;
+	
+	audio->Finalize();
+	delete audio;
 	/*delete dxCommon;*/
 	/*delete spManager;
 	delete sprite;*/

@@ -1,321 +1,147 @@
 #include "Audio.h"
+#include <cassert>
+#include <fstream>
 
-Audio* Audio::instance = nullptr;
+///リンクの設定
+#pragma comment(lib,"xaudio2.lib")
 
-std::wstring multiToWideWinapi(std::string const& src)
+void Audio::Initialize(const std::string& directoryPath)
 {
-	auto const dest_size = ::MultiByteToWideChar(CP_ACP, 0U, src.data(), -1, nullptr, 0U);
-	std::vector<wchar_t> dest(static_cast<const unsigned _int64>(dest_size), L'\0');
-	if (::MultiByteToWideChar(CP_ACP, 0U, src.data(), -1, dest.data(), static_cast<int>(dest.size())) == 0)
-	{
-		throw std::system_error{ static_cast<int>(::GetLastError()), std::system_category() };
-	}
-	dest.resize(std::char_traits<wchar_t>::length(dest.data()));
-	dest.shrink_to_fit();
-	return std::wstring(dest.begin(), dest.end());
-}
+	directoryPath_ = directoryPath;
 
+	HRESULT result = S_FALSE;
+	IXAudio2MasteringVoice* masterVoice;
 
-Audio::Audio()
-{
-
-}
-
-
-Audio::~Audio()
-{
-	xAudio2.Reset();
-
-	std::list<AudioData>::iterator itr = audios.begin();
-
-	for (; itr != audios.end(); ++itr)
-	{
-		itr->Unload();
-	}
-}
-
-Audio* Audio::GetInstance()
-{
-	if (!instance)
-	{
-		instance = new Audio();
-	}
-
-	return instance;
-}
-
-void Audio::Destroy()
-{
-	MFShutdown();
-	delete instance;
-}
-
-void Audio::Initialize()
-{
-	HRESULT result;
-
-	MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
-
-	result = XAudio2Create(&xAudio2, 0);
+	//xAudioエンジンのインスタンス生成
+	result = XAudio2Create(&xAudio2_,0,XAUDIO2_DEFAULT_PROCESSOR);
 	assert(SUCCEEDED(result));
-
-#if defined(_DEBUG)
-	XAUDIO2_DEBUG_CONFIGURATION debug{ 0 };
-	debug.TraceMask = XAUDIO2_LOG_ERRORS | XAUDIO2_LOG_WARNINGS;
-	debug.BreakMask = XAUDIO2_LOG_ERRORS;
-	xAudio2->SetDebugConfiguration(&debug, 0);
-#endif
-
 	//マスターボイスを生成
-	result = xAudio2->CreateMasteringVoice(&masterVoice);
+	result = xAudio2_->CreateMasteringVoice(&masterVoice);
 	assert(SUCCEEDED(result));
+
 }
 
-void Audio::Update()
+void Audio::LoadWave(const std::string& filename)
 {
-	for (AudioData& audio : audios)
-	{
-		audio.playTrigger = false;
+	//重複読み込みを回避する
+	if (soundData_.find(filename) != soundData_.end()) {
+		//何もせず抜ける
+		return;
 	}
 
-	if (!playHandleArray.empty())
-	{
-		for (PlayAudioArray& audioArray : playHandleArray)
-		{
-			if (NowPlay(audioArray.handles[static_cast<const unsigned _int64>(audioArray.nowIdx)]))
-			{
-				audioArray.nowIdx++;
+	//パスとファイル名を連結してフルパスを得る
+	std::string fullpath = directoryPath_ + filename;
 
-				if (static_cast<uint32_t>(audioArray.nowIdx) < audioArray.handles.size())
-				{
-					PlayWave(audioArray.handles[static_cast<const unsigned _int64>(audioArray.nowIdx)]);
-				}
-			}
-		}
+	//ファイル入力ストリームのインスタンス
+	std::ifstream file;
+	//.wavファイルをバイナリモードで開く
+	file.open(fullpath,std::ios_base::binary);
+	//ファイルオープン失敗を検出する
+	assert(file.is_open());
 
-		//全部再生しきったら削除
-		std::vector<PlayAudioArray>::iterator itr = playHandleArray.begin();
-		for (; itr != playHandleArray.end();)
-		{
-			if (itr->handles.size() <= static_cast<uint32_t>(itr->nowIdx))
-			{
-				itr = playHandleArray.erase(itr);
-			}
-			else
-			{
-				++itr;
-			}
-		}
+	//wavデータ読み込み
+	//RIFFヘッダーの読み込み
+	RiffHeader riff;
+	file.read((char*)& riff, sizeof(riff));
+	//ファイルがRIFFかどうかチェック
+	if (strncmp(riff.chunk.id, "RIFF", 4) != 0){
+		assert(0);
 	}
+	//タイプがWAVEかチェック
+	if (strncmp(riff.type, "WAVE", 4) != 0) {
+		assert(0);
+	}
+
+	//Formatチャンクの読み込み
+	FormatChunk format = {};
+	//チャンクヘッダーの確認
+	file.read((char*)&format, sizeof(ChunkHeader));
+	if (strncmp(format.chunk.id, "fmt ", 4) != 0) {
+		assert(0);
+	}
+	//チャンク本体の読み込み
+	assert(format.chunk.size <= sizeof(format.fmt));
+	file.read((char*)&format.fmt, format.chunk.size);
+
+	//Dataチャンクの読み込み
+	ChunkHeader data;
+	file.read((char*)& data, sizeof(data));
+	//JUNKチャンクを検出した場合
+	if (strncmp(data.id, "JUNK", 4) == 0) {
+		//読み取り位置をJUNKの終わりまで進める
+		file.seekg(data.size, std::ios_base::cur);
+		//再読み込み
+		file.read((char*)&data, sizeof(data));
+	}
+	if (strncmp(data.id, "data", 4) != 0) {
+		assert(0);
+	}
+	//Dataチャンクのデータ部(波形データ)の読み込み
+	char* pBuffer = new char[data.size];
+	file.read(pBuffer, data.size);
+
+	//waveファイルを閉じる
+	file.close();
+
+	//読み込んだ音声データをreturn
+	//returnする為の音声データ
+	SoundData soundData = {};
+	soundData.wfex = format.fmt;
+	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
+	soundData.bufferSize = data.size;
+
+	//サウンドデータを連想配列に格納
+	soundData_.insert(std::make_pair(filename,soundData));
+
 }
 
-bool Audio::NowPlay(const uint32_t& Handle)
+void Audio::UnLoad(SoundData* soundData)
 {
-	std::list<AudioData>::iterator itr = audios.begin();
+	//バッファのメモリを解放
+	delete[] soundData->pBuffer;
 
-	for (size_t i = 0; i < Handle; i++)
-	{
-		itr++;
-	}
-
-	if (itr->pSourceVoice != nullptr)
-	{
-		XAUDIO2_VOICE_STATE state;
-
-		itr->pSourceVoice->GetState(&state);
-
-		return !(state.pCurrentBufferContext == nullptr);
-	}
-	else
-	{
-		return false;
-	}
+	soundData->pBuffer = 0;
+	soundData->bufferSize = 0;
+	soundData->wfex = {};
 }
 
-void Audio::ChangeVolume(const uint32_t& Handle, float Volume)
-{
-	std::list<AudioData>::iterator itr = audios.begin();
-
-	for (size_t i = 0; i < Handle; i++)
-	{
-		itr++;
-	}
-
-	itr->volume = Volume;
-
-	if (itr->pSourceVoice != nullptr)
-	{
-		itr->pSourceVoice->SetVolume(itr->volume);
-	}
-}
-
-float Audio::GetVolume(const uint32_t& Handle)
-{
-	std::list<AudioData>::iterator itr = audios.begin();
-
-	for (size_t i = 0; i < Handle; i++)
-	{
-		itr++;
-	}
-
-	return itr->volume;
-}
-
-uint32_t Audio::LoadAudio(std::string FileName, const float& Volume)
-{
-	HRESULT result = 0;
-
-	if (!audios.empty())
-	{
-		uint32_t i = 0;
-		for (auto itr = audios.begin(); itr != audios.end(); itr++)
-		{
-			if (itr->filePass == FileName)
-			{
-				return i;
-			}
-			i++;
-		}
-	}
-
-	audios.emplace_back(FileName);
-
-	std::wstring path = multiToWideWinapi(FileName);
-
-	result = MFCreateSourceReaderFromURL(path.c_str(), NULL, &audios.back().pMFSourceReader);
-
-	IMFMediaType* pMFMediaType{ nullptr };
-	MFCreateMediaType(&pMFMediaType);
-	pMFMediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
-	pMFMediaType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
-	audios.back().pMFSourceReader->SetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, nullptr, pMFMediaType);
-
-	pMFMediaType->Release();
-	pMFMediaType = nullptr;
-	audios.back().pMFSourceReader->GetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, &pMFMediaType);
-
-	MFCreateWaveFormatExFromMFMediaType(pMFMediaType, &audios.back().waveFormat, nullptr);
-
-	while (true)
-	{
-		IMFSample* pMFSample{ nullptr };
-		DWORD dwStreamFlags{ 0 };
-		audios.back().pMFSourceReader->ReadSample(((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM), 0, nullptr, &dwStreamFlags, nullptr, &pMFSample);
-
-		if (dwStreamFlags & MF_SOURCE_READERF_ENDOFSTREAM)
-		{
-			break;
-		}
-
-		IMFMediaBuffer* pMFMediaBuffer{ nullptr };
-		pMFSample->ConvertToContiguousBuffer(&pMFMediaBuffer);
-
-		BYTE* pBuffer{ nullptr };
-		DWORD cbCurrentLength{ 0 };
-		pMFMediaBuffer->Lock(&pBuffer, nullptr, &cbCurrentLength);
-
-		audios.back().mediaData.resize(audios.back().mediaData.size() + cbCurrentLength);
-		memcpy(audios.back().mediaData.data() + audios.back().mediaData.size() - cbCurrentLength, pBuffer, cbCurrentLength);
-
-		pMFMediaBuffer->Unlock();
-
-		pMFMediaBuffer->Release();
-		pMFSample->Release();
-	}
-
-	uint32_t handle = static_cast<uint32_t>(audios.size() - 1);
-
-	ChangeVolume(handle, Volume);
-
-	return handle;
-}
-
-int32_t Audio::PlayWave(const uint32_t& Handle, bool LoopFlag)
+void Audio::PlayWave(const std::string& filename)
 {
 	HRESULT result;
+	
+	std::map<std::string, SoundData>::iterator it = soundData_.find(filename);
+	//未読み込みの検出
+	assert(it != soundData_.end());
+	//サウンドデータの参照を取得
+	SoundData& soundData = it->second;
 
-	std::list<AudioData>::iterator itr = audios.begin();
-	for (size_t i = 0; i < Handle; i++)
-	{
-		itr++;
-	}
+	//波形フォーマットを元にSourceVoiceの生成
+	IXAudio2SourceVoice* pSourceVoice = nullptr;
+	result = xAudio2_->CreateSourceVoice(&pSourceVoice,&soundData.wfex);
+	assert(SUCCEEDED(result));
 
-	//同時に同じ音源を再生しない
-	if (itr->playTrigger)
-	{
-		return -1;
-	}
-
-	//ループ再生で再生しようとしたら既に流れているものを停止
-	if (LoopFlag && NowPlay(Handle))
-	{
-		itr->pSourceVoice->Stop();
-	}
-
-
-	xAudio2->CreateSourceVoice(&itr->pSourceVoice, itr->waveFormat);
-
-	XAUDIO2_BUFFER buffer{ 0 };
-	buffer.pAudioData = itr->mediaData.data();
-	buffer.Flags = XAUDIO2_END_OF_STREAM;
-	buffer.AudioBytes = sizeof(BYTE) * static_cast<UINT32>(itr->mediaData.size());
-
-	if (LoopFlag)
-	{
-		buffer.LoopCount = XAUDIO2_LOOP_INFINITE;
-	}
-
-	//音量の設定
-	itr->pSourceVoice->SetVolume(itr->volume);
+	//再生する波形データの設定
+	XAUDIO2_BUFFER buf{};
+	buf.pAudioData = soundData.pBuffer;
+	buf.AudioBytes = soundData.bufferSize;
+	buf.Flags = XAUDIO2_END_OF_STREAM;
 
 	//波形データの再生
-	result = itr->pSourceVoice->SubmitSourceBuffer(&buffer);
-	result = itr->pSourceVoice->Start();
+	result = pSourceVoice->SubmitSourceBuffer(&buf);
+	result = pSourceVoice->Start();
 
-	itr->playTrigger = true;
 
-	return 1;
 }
 
-int32_t Audio::PlayWaveArray(const std::vector<uint32_t>& handles)
+void Audio::Finalize()
 {
-	if (handles.empty())
+	//XAudio2解放
+	xAudio2_.Reset();
+	//サウンドデータ解放
+	std::map<std::string, SoundData>::iterator it = soundData_.begin();
+	for (; it != soundData_.end(); it++)
 	{
-		return 0;
+		UnLoad(&it->second);
 	}
-
-	playHandleArray.emplace_back(handles);
-	return PlayWave(handles[0]);
-};
-
-void Audio::StopWave(const uint32_t& Handle)
-{
-	std::list<AudioData>::iterator itr = audios.begin();
-
-	for (size_t i = 0; i < Handle; i++)
-	{
-		itr++;
-	}
-
-	if (itr->pSourceVoice != nullptr)
-	{
-		itr->pSourceVoice->Stop();
-		itr->pSourceVoice->FlushSourceBuffers();
-	}
-}
-
-AudioData::AudioData(std::string FilePass) :filePass(FilePass)
-{
-}
-
-void AudioData::Unload()
-{
-	if (pBuffer != nullptr)
-	{
-		delete[] pBuffer;
-	}
-}
-
-PlayAudioArray::PlayAudioArray(const std::vector<uint32_t>& Handles) :handles(Handles)
-{
+	soundData_.clear();
 }
