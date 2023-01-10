@@ -33,16 +33,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	winApp = new WinApp();
 	winApp->Initialize();
 
-	input = new Input();
+	input = Input::GetInstance();
 	input->Initialize(winApp);
 
 	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(winApp);
 
-	audio = new Audio();
-	audio->Initialize();
-	audio->LoadWave("se_amd06.wav");
-
+	audio = Audio::GetInstance();
+	
 	//情的初期化
 	Sprite::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
 	// 3Dオブジェクト静的初期化
@@ -69,9 +67,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 		gameScene->Update();
 
-		if (input->TriggerKey(DIK_SPACE)) {
-			audio->PlayWave("se_amd06.wav");
-		}
+		
 
 		//描画前処理
 		dxCommon->preDraw();
@@ -89,11 +85,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	//windowAPIの終了処理
 	winApp->Finalize();
 	//入力解放
-	delete input;
 	delete winApp;
-
 	audio->Finalize();
-	delete audio;
 
 	delete gameScene;
 

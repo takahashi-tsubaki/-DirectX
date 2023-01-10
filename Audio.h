@@ -57,6 +57,8 @@ public:
 	//‰ğ•úˆ—
 	void Finalize();
 
+	static Audio* GetInstance();
+
 private:
 	// Microsoft::WRL::‚ğÈ—ª
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;

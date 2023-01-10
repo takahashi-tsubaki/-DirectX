@@ -105,6 +105,9 @@
     <ClCompile Include="scene\gameScene.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
+    <ClCompile Include="scene\titleScene.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Input.h">
@@ -162,6 +165,9 @@
       <Filter>ヘッダー ファイル\3D</Filter>
     </ClInclude>
     <ClInclude Include="scene\gameScene.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\titleScene.h">
       <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
   </ItemGroup>

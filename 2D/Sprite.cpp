@@ -281,14 +281,14 @@ void Sprite::PostDraw()
 Sprite* Sprite::Create(UINT texNumber, XMFLOAT2 position, XMFLOAT4 color, XMFLOAT2 anchorpoint, bool isFlipX, bool isFlipY)
 {
 	// 仮サイズ
-	XMFLOAT2 size = { 100.0f, 100.0f };
+	XMFLOAT2 size = { 0.5f, 0.5f };
 
 	if (texBuff[texNumber])
 	{
 		// テクスチャ情報取得
 		D3D12_RESOURCE_DESC resDesc = texBuff[texNumber]->GetDesc();
 		// スプライトのサイズをテクスチャのサイズに設定
-		size = { (float)resDesc.Width, (float)resDesc.Height };
+		size = { (float)resDesc.Width, (float)resDesc.Height};
 	}
 
 	// Spriteのインスタンスを生成

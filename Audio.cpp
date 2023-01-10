@@ -133,6 +133,12 @@ void Audio::PlayWave(const std::string& filename)
 
 }
 
+Audio* Audio::GetInstance()
+{
+	static Audio instance;
+	return &instance;
+}
+
 void Audio::Finalize()
 {
 	//XAudio2‰ð•ú

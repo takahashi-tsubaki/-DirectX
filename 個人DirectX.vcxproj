@@ -161,6 +161,7 @@
     <ClCompile Include="math\Vector2.cpp" />
     <ClCompile Include="math\Vector3.cpp" />
     <ClCompile Include="scene\gameScene.cpp" />
+    <ClCompile Include="scene\titleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2D\Sprite.h" />
@@ -182,6 +183,7 @@
     <ClInclude Include="math\Vector2.h" />
     <ClInclude Include="math\Vector3.h" />
     <ClInclude Include="scene\gameScene.h" />
+    <ClInclude Include="scene\titleScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ObjBasicShader.hlsli" />
