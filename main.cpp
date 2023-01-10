@@ -2,13 +2,7 @@
 #include "Core/WinApp.h"
 #include "Core/DirectXCommon.h"
 #include "Core/FPS.h"
-
-#include "2D/Sprite.h"
-#include "2D/SpriteManager.h"
-
-#include "3D/Object3d.h"
-#include "3D/Model.h"
-#include "3D/Camera.h"
+#include "scene/gameScene.h"
 
 #include "Audio.h"
 
@@ -27,97 +21,37 @@ LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 {
 	OutputDebugStringA("Hello DirectX!!\n");
-
-
 	//FPS
 	FPS* fps = new FPS;
 
 	WinApp* winApp = nullptr;
+	Input* input = nullptr;
+	DirectXCommon* dxCommon = nullptr;
+	Audio* audio = nullptr;
+	GameScene* gameScene = nullptr;
+
 	winApp = new WinApp();
 	winApp->Initialize();
 
-	Input* input = nullptr;
 	input = new Input();
 	input->Initialize(winApp);
 
-	DirectXCommon* dxCommon = nullptr;
 	dxCommon = DirectXCommon::GetInstance();
 	dxCommon->Initialize(winApp);
 
-	SpriteManager* spManager = nullptr;
-	spManager = SpriteManager::GetInstance();
-	spManager->Initialize(dxCommon);
-
-	Audio* audio = nullptr;
 	audio = new Audio();
 	audio->Initialize();
-
 	audio->LoadWave("se_amd06.wav");
-	
 
 	//情的初期化
-	Sprite::StaticInitialize(dxCommon->GetDevice(),WinApp::window_width,WinApp::window_height);
-
+	Sprite::StaticInitialize(dxCommon->GetDevice(), WinApp::window_width, WinApp::window_height);
 	// 3Dオブジェクト静的初期化
 	Object3d::StaticInitialize(dxCommon->GetDevice());
-
 	//ライト情的初期化
 	Light::StaticInitalize(dxCommon->GetDevice());
 
-	Sprite* sprite = nullptr;
-
-	Sprite::LoadTexture(1, L"Resources/kuribo-.jpg");
-
-	Sprite::LoadTexture(2, L"Resources/mario.jpg");
-
-	sprite = Sprite::Create(1,{0.0f,0.0f});
-
-	Model* model = nullptr;
-	Object3d* objModel = nullptr;
-
-	Model* enemymModel = nullptr;
-	Object3d* objEnemy = nullptr;
-
-	objModel = Object3d::Create();
-	model = Model::CreateFromOBJ("skydome");
-
-	objEnemy = Object3d::Create();
-	enemymModel = Model::CreateFromOBJ("enemy");
-
-	objModel->SetModel(model);
-
-	objEnemy->SetModel(enemymModel);
-
-	Light* light = nullptr;
-	//ライト生成
-	light = Light::Create();
-	//ライト色を設定
-	light->SetLightColor({ 1,1,1 });
-	//3Dオブジェクトにライトをセット
-	Object3d::SetLight(light);
-
-	Camera* camera = nullptr;
-
-	camera = new Camera(WinApp::window_width,WinApp::window_height);
-	// カメラ注視点をセット
-	camera->SetTarget({ 0, 1, 0 });
-
-	// 3Dオブジェクトにカメラをセット
-	Object3d::SetCamera(camera);
-	/*sprite->SetSize({ 1.0f,1.0f });*/
-
-
-	/*sprite->SetPosition({0.1f,0.1f});*/
-
-
-	//ここからDirectX初期化処理
-
-
-	//ここから描画初期化処理
-
-
-	//ここまで描画初期化処理
-
+	gameScene = new GameScene();
+	gameScene->Initalize();
 
 	//ゲームループ
 	while (true)
@@ -133,13 +67,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 		input->Update();
 
-		spManager->Update();
-
-		camera->Update();
-
-		objModel->Update();
-		objEnemy->Update();
-		light->Update();
+		gameScene->Update();
 
 		if (input->TriggerKey(DIK_SPACE)) {
 			audio->PlayWave("se_amd06.wav");
@@ -148,35 +76,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 		//描画前処理
 		dxCommon->preDraw();
 
-		//描画処理
-#pragma region 背景スプライト描画
-// 背景スプライト描画前処理
-		Sprite::PreDraw(dxCommon->GetCommandList());
-		// 背景スプライト描画
-		/*spriteBG->Draw();*/
-		sprite->Draw();
-		/// <summary>
-		/// ここに背景スプライトの描画処理を追加できる
-		/// </summary>
+		//ゲームシーンの描画
+		gameScene->Draw();
 
-		// スプライト描画後処理
-		Sprite::PostDraw();
-#pragma endregion
-		
-#pragma region 3Dオブジェクト描画
-		// 3Dオブジェクト描画前処理
-		Object3d::PreDraw(dxCommon->GetCommandList());
-
-		// 3Dオブクジェクトの描画
-		objModel->Draw();
-		objEnemy->Draw();
-		/// <summary>
-		/// ここに3Dオブジェクトの描画処理を追加できる
-		/// </summary>
-
-		// 3Dオブジェクト描画後処理
-		Object3d::PostDraw();
-#pragma endregion
 		//描画後処理
 		dxCommon->postDraw();
 
@@ -189,20 +91,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	//入力解放
 	delete input;
 	delete winApp;
-	
+
 	audio->Finalize();
 	delete audio;
-	/*delete dxCommon;*/
-	/*delete spManager;
-	delete sprite;*/
 
-	//input = nullptr;
-	//winApp = nullptr;
-	/*dxCommon = nullptr;*/
-	//spManager = nullptr;
-	//sprite = nullptr;
-	///*delete obj3d;
-	//delete obj3d2;*/
+	delete gameScene;
+
+
 	return 0;
 }
 

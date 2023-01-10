@@ -54,7 +54,7 @@ bool Input::PushKey(BYTE keyNum)
 bool Input::TriggerKey(BYTE keyNum)
 {
 	// w’èƒL[‚ğ‰Ÿ‚³‚ê‚½uŠÔ‚Étrue‚ğ•Ô‚·
-	if (!oldkeys[keyNum] && keys[keyNum] )
+	if (!oldkeys[keyNum] && keys[keyNum])
 	{
 		return true;
 	}
@@ -71,4 +71,10 @@ bool Input::ReleaseKey(BYTE keyNum)
 	}
 	// ‚»‚¤‚Å‚È‚¯‚ê‚Îfalse‚ğ•Ô‚·
 	return false;
+}
+
+Input* Input::GetInstance()
+{
+	static Input instance;
+	return &instance;
 }
