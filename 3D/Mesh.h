@@ -1,101 +1,148 @@
-#pragma once
-
-#include "../math/Vector2.h"
-#include "../math/Vector3.h"
+ï»¿#pragma once
 
 #include "Material.h"
+#include <DirectXMath.h>
 #include <Windows.h>
 #include <d3d12.h>
 #include <d3dx12.h>
-#include <unordered_map>
 #include <vector>
 #include <wrl.h>
 
-class Mesh {
-private:
-	// Microsoft::WRL::‚ğÈ—ª
-	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+#include <unordered_map>
 
-public:
-	//’¸“_ƒf[ƒ^\‘¢‘ÌiƒeƒNƒXƒ`ƒƒ‚ ‚èj
+/// <summary>
+/// å½¢çŠ¶ãƒ‡ãƒ¼ã‚¿
+/// </summary>
+class Mesh {
+  private: // ã‚¨ã‚¤ãƒªã‚¢ã‚¹
+	// Microsoft::WRL::ã‚’çœç•¥
+	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+	// DirectX::ã‚’çœç•¥
+	using XMFLOAT2 = DirectX::XMFLOAT2;
+	using XMFLOAT3 = DirectX::XMFLOAT3;
+	using XMFLOAT4 = DirectX::XMFLOAT4;
+	using XMVECTOR = DirectX::XMVECTOR;
+	using XMMATRIX = DirectX::XMMATRIX;
+
+  public: // ã‚µãƒ–ã‚¯ãƒ©ã‚¹
+	// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿æ§‹é€ ä½“ï¼ˆãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚ã‚Šï¼‰
 	struct VertexPosNormalUv {
-		Vector3 pos;    // xyzÀ•W
-		Vector3 normal; // –@üƒxƒNƒgƒ‹
-		Vector2 uv;     // uvÀ•W
+		XMFLOAT3 pos;    // xyzåº§æ¨™
+		XMFLOAT3 normal; // æ³•ç·šãƒ™ã‚¯ãƒˆãƒ«
+		XMFLOAT2 uv;     // uvåº§æ¨™
 	};
 
-// ƒƒ“ƒoŠÖ”
+  public: // é™çš„ãƒ¡ãƒ³ãƒé–¢æ•°
+	/// <summary>
+	/// é™çš„åˆæœŸåŒ–
+	/// </summary>
+	/// <param name="device">ãƒ‡ãƒã‚¤ã‚¹</param>
+	static void StaticInitialize(ID3D12Device* device);
 
-	// –¼‘O‚ğæ“¾
-	const std::string& GetName() { return name_; }
+  private: // é™çš„ãƒ¡ãƒ³ãƒå¤‰æ•°
+	// ãƒ‡ãƒã‚¤ã‚¹
+	static ID3D12Device* device;
 
-	// –¼‘O‚ğƒZƒbƒg
-	void SetName(const std::string& name_);
+  public: // ãƒ¡ãƒ³ãƒé–¢æ•°
+	/// <summary>
+	/// åå‰ã‚’å–å¾—
+	/// </summary>
+	/// <returns>åå‰</returns>
+	const std::string& GetName() { return name; }
 
-	///’¸“_ƒf[ƒ^‚Ì’Ç‰Á
+	/// <summary>
+	/// åå‰ã‚’ã‚»ãƒƒãƒˆ
+	/// </summary>
+	/// <param name="name">åå‰</param>
+	void SetName(const std::string& name);
+
+	/// <summary>
+	/// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã®è¿½åŠ 
+	/// </summary>
+	/// <param name="vertex">é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿</param>
 	void AddVertex(const VertexPosNormalUv& vertex);
 
-	// ƒCƒ“ƒfƒbƒNƒXƒf[ƒ^‚Ì’Ç‰Á
+	/// <summary>
+	/// é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã®è¿½åŠ 
+	/// </summary>
+	/// <param name="index">ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹</param>
 	void AddIndex(unsigned short index);
 
-	//@’¸“_ƒf[ƒ^‚Ì”‚ğæ“¾
-	inline size_t GetVertexCount() { return vertices_.size(); }
+	/// <summary>
+	/// ãƒãƒ†ãƒªã‚¢ãƒ«ã®å–å¾—
+	/// </summary>
+	/// <returns>ãƒãƒ†ãƒªã‚¢ãƒ«</returns>
+	Material* GetMaterial() { return material; }
 
-	// ƒGƒbƒW•½ŠŠ‰»ƒf[ƒ^‚Ì’Ç‰Á
-	void AddSmoothData(unsigned short indexPosition, unsigned short indexVertex);
-
-	// •½ŠŠ‰»‚³‚ê‚½’¸“_–@ü‚ÌŒvZ
-	void CalculateSmoothedVertexNormals();
-
-	// ƒ}ƒeƒŠƒAƒ‹‚Ìæ“¾
-	Material* GetMaterial() { return material_; }
-
-	// ƒ}ƒeƒŠƒAƒ‹‚ÌŠ„‚è“–‚Ä
+	/// <summary>
+	/// ãƒãƒ†ãƒªã‚¢ãƒ«ã®å‰²ã‚Šå½“ã¦
+	/// </summary>
+	/// <param name="material">ãƒãƒ†ãƒªã‚¢ãƒ«</param>
 	void SetMaterial(Material* material);
 
-	// ƒoƒbƒtƒ@‚Ì¶¬
+	/// <summary>
+	/// ãƒãƒƒãƒ•ã‚¡ã®ç”Ÿæˆ
+	/// </summary>
 	void CreateBuffers();
 
-	// ’¸“_ƒoƒbƒtƒ@‚Ìæ“¾
-	const D3D12_VERTEX_BUFFER_VIEW& GetVBView() { return vbView_; }
+	/// <summary>
+	/// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡å–å¾—
+	/// </summary>
+	/// <returns>é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡</returns>
+	const D3D12_VERTEX_BUFFER_VIEW& GetVBView() { return vbView; }
 
-	/// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚Ìæ“¾
-	const D3D12_INDEX_BUFFER_VIEW& GetIBView() { return ibView_; }
+	/// <summary>
+	/// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡å–å¾—
+	/// </summary>
+	/// <returns>ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡</returns>
+	const D3D12_INDEX_BUFFER_VIEW& GetIBView() { return ibView; }
 
-	// •`‰æ
-	void Draw(
-		ID3D12GraphicsCommandList* commandList, UINT rooParameterIndexMaterial,
-		UINT rooParameterIndexTexture);
+	/// <summary>
+	/// æç”»
+	/// </summary>
+	/// <param name="cmdList">å‘½ä»¤ç™ºè¡Œå…ˆã‚³ãƒãƒ³ãƒ‰ãƒªã‚¹ãƒˆ</param>
+	void Draw(ID3D12GraphicsCommandList* cmdList);
 
-	// •`‰æiƒeƒNƒXƒ`ƒƒ·‚µ‘Ö‚¦”Åj
-	//@·‚µ‘Ö‚¦‚éƒeƒNƒXƒ`ƒƒƒnƒ“ƒhƒ‹
-	void Draw(
-		ID3D12GraphicsCommandList* commandList, UINT rooParameterIndexMaterial,
-		UINT rooParameterIndexTexture, uint32_t textureHandle);
+	/// <summary>
+	/// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã®æ•°ã‚’å–å¾—
+	/// </summary>
+	/// <returns></returns>
+	inline size_t GetVertexCount() { return vertices.size(); }
 
-	// ’¸“_”z—ñ‚Ìæ“¾
-	inline const std::vector<VertexPosNormalUv>& GetVertices() { return vertices_; }
+	/// <summary>
+	/// ã‚¨ãƒƒã‚¸å¹³æ»‘åŒ–ãƒ‡ãƒ¼ã‚¿ã®è¿½åŠ 
+	/// </summary>
+	/// <param name="indexPos"></param>
+	/// <param name="indexVertex"></param>
+	void AddSmoothData(unsigned short indexPos, unsigned short indexVertex);
 
-	// ƒCƒ“ƒfƒbƒNƒX”z—ñ‚Ìæ“¾
-	inline const std::vector<unsigned short>& GetIndices() { return indices_; }
+	/// <summary>
+	/// å¹³æ»‘åŒ–ã•ã‚ŒãŸé ‚ç‚¹æ³•ç·šã®è¨ˆç®—
+	/// </summary>
+	void CalculateSmoothedVertexNormals();
 
-private: // ƒƒ“ƒo•Ï”
-  // –¼‘O
-	std::string name_;
-	// ’¸“_ƒoƒbƒtƒ@
-	ComPtr<ID3D12Resource> vertBuff_;
-	// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@
-	ComPtr<ID3D12Resource> indexBuff_;
-	// ’¸“_ƒoƒbƒtƒ@ƒrƒ…[
-	D3D12_VERTEX_BUFFER_VIEW vbView_ = {};
-	// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@ƒrƒ…[
-	D3D12_INDEX_BUFFER_VIEW ibView_ = {};
-	// ’¸“_ƒf[ƒ^”z—ñ
-	std::vector<VertexPosNormalUv> vertices_;
-	// ’¸“_ƒCƒ“ƒfƒbƒNƒX”z—ñ
-	std::vector<unsigned short> indices_;
-	// ’¸“_–@üƒXƒ€[ƒWƒ“ƒO—pƒf[ƒ^
-	std::unordered_map<unsigned short, std::vector<unsigned short>> smoothData_;
-	// ƒ}ƒeƒŠƒAƒ‹
-	Material* material_ = nullptr;
+  private: // ãƒ¡ãƒ³ãƒå¤‰æ•°
+	// åå‰
+	std::string name;
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡
+	ComPtr<ID3D12Resource> vertBuff;
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡
+	ComPtr<ID3D12Resource> indexBuff;
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼
+	D3D12_VERTEX_BUFFER_VIEW vbView = {};
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼
+	D3D12_INDEX_BUFFER_VIEW ibView = {};
+	// é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿é…åˆ—
+	std::vector<VertexPosNormalUv> vertices;
+	// é ‚ç‚¹ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹é…åˆ—
+	std::vector<unsigned short> indices;
+	// ãƒãƒ†ãƒªã‚¢ãƒ«
+	Material* material = nullptr;
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®ãƒãƒƒãƒ—
+	VertexPosNormalUv* vertMap = nullptr;
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã®ãƒãƒƒãƒ—
+	unsigned short* indexMap = nullptr;
+
+	//é ‚ç‚¹æ³•ç·šã‚¹ãƒ ãƒ¼ã‚¸ãƒ³ã‚°ç”¨ãƒ‡ãƒ¼ã‚¿
+	std::unordered_map<unsigned short, std::vector<unsigned short>> smoothData;
 };

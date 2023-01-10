@@ -1,131 +1,125 @@
-#include "../Core/DirectXCommon.h"
-#include "../math/MyMath.h"
-#include "Mesh.h"
+ï»¿#include "Mesh.h"
 #include <cassert>
 #include <d3dcompiler.h>
 
-using namespace MyMath;
-
 #pragma comment(lib, "d3dcompiler.lib")
 
-void Mesh::SetName(const std::string& name_) { this->name_ = name_; }
+using namespace DirectX;
 
-void Mesh::AddVertex(const VertexPosNormalUv& vertex) { vertices_.emplace_back(vertex); }
+/// <summary>
+/// é™çš„ãƒ¡ãƒ³ãƒå¤‰æ•°ã®å®Ÿä½“
+/// </summary>
+ID3D12Device* Mesh::device = nullptr;
 
-void Mesh::AddIndex(unsigned short index) { indices_.emplace_back(index); }
+void Mesh::StaticInitialize(ID3D12Device* device) {
+	Mesh::device = device;
 
-void Mesh::AddSmoothData(unsigned short indexPosition, unsigned short indexVertex) {
-	smoothData_[indexPosition].emplace_back(indexVertex);
+	// ãƒãƒ†ãƒªã‚¢ãƒ«ã®é™çš„åˆæœŸåŒ–
+	Material::StaticInitialize(device);
 }
 
-void Mesh::CalculateSmoothedVertexNormals() {
-	auto itr = smoothData_.begin();
-	for (; itr != smoothData_.end(); ++itr) {
-		// Še–Ê—p‚Ì‹¤’Ê’¸“_ƒRƒŒƒNƒVƒ‡ƒ“
-		std::vector<unsigned short>& v = itr->second;
-		// ‘S’¸“_‚Ì–@ü‚ğ•½‹Ï‚·‚é
-		Vector3 normal = {};
-		for (unsigned short index : v) {
-			normal += vertices_[index].normal;
-		}
-		normal /= (float)v.size();
-		normal = Vector3Normalize(normal);
+void Mesh::SetName(const std::string& name) { this->name = name; }
 
-		for (unsigned short index : v) {
-			vertices_[index].normal = normal;
-		}
-	}
-}
+void Mesh::AddVertex(const VertexPosNormalUv& vertex) { vertices.emplace_back(vertex); }
 
-void Mesh::SetMaterial(Material* material) { this->material_ = material; }
+void Mesh::AddIndex(unsigned short index) { indices.emplace_back(index); }
+
+void Mesh::SetMaterial(Material* material) { this->material = material; }
 
 void Mesh::CreateBuffers() {
 	HRESULT result;
 
-	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * vertices_.size());
+	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * vertices.size());
 
-	// ƒq[ƒvƒvƒƒpƒeƒB
-	CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-	// ƒŠƒ\[ƒXİ’è
-	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeVB);
+	// ãƒ’ãƒ¼ãƒ—ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£
+	CD3DX12_HEAP_PROPERTIES heapPropsVertexBuffer = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	// ãƒªã‚½ãƒ¼ã‚¹è¨­å®š
+	CD3DX12_RESOURCE_DESC resourceDescVertexBuffer = CD3DX12_RESOURCE_DESC::Buffer(sizeVB);
 
-	// ’¸“_ƒoƒbƒtƒ@¶¬
-	result = DirectXCommon::GetInstance()->GetDevice()->CreateCommittedResource(
-		&heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-		IID_PPV_ARGS(&vertBuff_));
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ç”Ÿæˆ
+	result = device->CreateCommittedResource(
+	  &heapPropsVertexBuffer, D3D12_HEAP_FLAG_NONE, &resourceDescVertexBuffer,
+	  D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vertBuff));
+	assert(SUCCEEDED(result));
+	
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã®ãƒãƒƒãƒ”ãƒ³ã‚°
+	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
 	assert(SUCCEEDED(result));
 
-	// ’¸“_ƒoƒbƒtƒ@‚Ö‚Ìƒf[ƒ^“]‘—
-	VertexPosNormalUv* vertMap = nullptr;
-	result = vertBuff_->Map(0, nullptr, (void**)&vertMap);
-	if (SUCCEEDED(result)) {
-		std::copy(vertices_.begin(), vertices_.end(), vertMap);
-		vertBuff_->Unmap(0, nullptr);
-	}
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒ‡ãƒ¼ã‚¿è»¢é€
+	std::copy(vertices.begin(), vertices.end(), vertMap);
 
-	// ’¸“_ƒoƒbƒtƒ@ƒrƒ…[‚Ìì¬
-	vbView_.BufferLocation = vertBuff_->GetGPUVirtualAddress();
-	vbView_.SizeInBytes = sizeVB;
-	vbView_.StrideInBytes = sizeof(vertices_[0]);
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼ã®ä½œæˆ
+	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
+	vbView.SizeInBytes = sizeVB;
+	vbView.StrideInBytes = sizeof(vertices[0]);
 
-	if (FAILED(result)) {
-		assert(0);
-		return;
-	}
+	UINT sizeIB = static_cast<UINT>(sizeof(unsigned short) * indices.size());
 
-	UINT sizeIB = static_cast<UINT>(sizeof(unsigned short) * indices_.size());
-	// ƒŠƒ\[ƒXİ’è
-	resourceDesc.Width = sizeIB;
-	// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@¶¬
-	result = DirectXCommon::GetInstance()->GetDevice()->CreateCommittedResource(
-		&heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-		IID_PPV_ARGS(&indexBuff_));
-	if (FAILED(result)) {
-		assert(0);
-		return;
-	}
+	// ãƒ’ãƒ¼ãƒ—ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£
+	CD3DX12_HEAP_PROPERTIES heapPropsIndexBuffer = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	// ãƒªã‚½ãƒ¼ã‚¹è¨­å®š
+	CD3DX12_RESOURCE_DESC resourceDescIndexBuffer = CD3DX12_RESOURCE_DESC::Buffer(sizeIB);
 
-	// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚Ö‚Ìƒf[ƒ^“]‘—
-	unsigned short* indexMap = nullptr;
-	result = indexBuff_->Map(0, nullptr, (void**)&indexMap);
-	if (SUCCEEDED(result)) {
-		std::copy(indices_.begin(), indices_.end(), indexMap);
-		indexBuff_->Unmap(0, nullptr);
-	}
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ç”Ÿæˆ
+	result = device->CreateCommittedResource(
+	  &heapPropsIndexBuffer, D3D12_HEAP_FLAG_NONE, &resourceDescIndexBuffer,
+	  D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&indexBuff));
+	assert(SUCCEEDED(result));
 
-	// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@ƒrƒ…[‚Ìì¬
-	ibView_.BufferLocation = indexBuff_->GetGPUVirtualAddress();
-	ibView_.Format = DXGI_FORMAT_R16_UINT;
-	ibView_.SizeInBytes = sizeIB;
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã®ãƒãƒƒãƒ”ãƒ³ã‚°
+	result = indexBuff->Map(0, nullptr, (void**)&indexMap);
+	assert(SUCCEEDED(result));
+
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã¸ã®ãƒ‡ãƒ¼ã‚¿è»¢é€
+	std::copy(indices.begin(), indices.end(), indexMap);
+
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ãƒ“ãƒ¥ãƒ¼ã®ä½œæˆ
+	ibView.BufferLocation = indexBuff->GetGPUVirtualAddress();
+	ibView.Format = DXGI_FORMAT_R16_UINT;
+	ibView.SizeInBytes = sizeIB;
 }
 
-void Mesh::Draw(
-	ID3D12GraphicsCommandList* commandList, UINT rooParameterIndexMaterial,
-	UINT rooParameterIndexTexture) {
-	// ’¸“_ƒoƒbƒtƒ@‚ğƒZƒbƒg
-	commandList->IASetVertexBuffers(0, 1, &vbView_);
-	// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ğƒZƒbƒg
-	commandList->IASetIndexBuffer(&ibView_);
+void Mesh::Draw(ID3D12GraphicsCommandList* cmdList) {
+	// é ‚ç‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ã‚»ãƒƒãƒˆ
+	cmdList->IASetVertexBuffers(0, 1, &vbView);
+	// ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒãƒƒãƒ•ã‚¡ã‚’ã‚»ãƒƒãƒˆ
+	cmdList->IASetIndexBuffer(&ibView);
 
-	// ƒ}ƒeƒŠƒAƒ‹‚ÌƒOƒ‰ƒtƒBƒbƒNƒXƒRƒ}ƒ“ƒh‚ğƒZƒbƒg
-	material_->SetGraphicsCommand(commandList, rooParameterIndexMaterial, rooParameterIndexTexture);
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ã‚’ã‚»ãƒƒãƒˆ
+	cmdList->SetGraphicsRootDescriptorTable(2, material->GetGpuHandle());
 
-	// •`‰æƒRƒ}ƒ“ƒh
-	commandList->DrawIndexedInstanced((UINT)indices_.size(), 1, 0, 0, 0);
+	// ãƒãƒ†ãƒªã‚¢ãƒ«ã®å®šæ•°ãƒãƒƒãƒ•ã‚¡ã‚’ã‚»ãƒƒãƒˆ
+	ID3D12Resource* constBuff = material->GetConstantBuffer();
+	cmdList->SetGraphicsRootConstantBufferView(1, constBuff->GetGPUVirtualAddress());
+
+	// æç”»ã‚³ãƒãƒ³ãƒ‰
+	cmdList->DrawIndexedInstanced((UINT)indices.size(), 1, 0, 0, 0);
 }
 
-void Mesh::Draw(
-	ID3D12GraphicsCommandList* commandList, UINT rooParameterIndexMaterial,
-	UINT rooParameterIndexTexture, uint32_t textureHandle) {
-	// ’¸“_ƒoƒbƒtƒ@‚ğƒZƒbƒg
-	commandList->IASetVertexBuffers(0, 1, &vbView_);
-	// ƒCƒ“ƒfƒbƒNƒXƒoƒbƒtƒ@‚ğƒZƒbƒg
-	commandList->IASetIndexBuffer(&ibView_);
+void Mesh::AddSmoothData(unsigned short indexPos, unsigned short indexVertex)
+{
+	smoothData[indexPos].emplace_back(indexVertex);
+}
 
-	// ƒ}ƒeƒŠƒAƒ‹‚ÌƒOƒ‰ƒtƒBƒbƒNƒXƒRƒ}ƒ“ƒh‚ğƒZƒbƒg
-	material_->SetGraphicsCommand(
-		commandList, rooParameterIndexMaterial, rooParameterIndexTexture, textureHandle);
-
-	// •`‰æƒRƒ}ƒ“ƒh
-	commandList->DrawIndexedInstanced((UINT)indices_.size(), 1, 0, 0, 0);
+void Mesh::CalculateSmoothedVertexNormals()
+{
+	auto itr = smoothData.begin();
+	for (;itr!= smoothData.end(); itr++)
+	{
+		//å„é¢ç”¨ã®å…±é€šé ‚ç‚¹ã‚³ãƒ¬ã‚¯ã‚·ãƒ§ãƒ³
+		std::vector<unsigned short>&v = itr->second;
+		//å…¨é ‚ç‚¹ã®æ³•ç·šã‚’å¹³å‡ã™ã‚‹
+		XMVECTOR normal = {};
+		for (unsigned short index : v)
+		{
+			normal += XMVectorSet(vertices[index].normal.x, vertices[index].normal.y, vertices[index].normal.z, 0);
+		}
+		normal = XMVector3Normalize(normal/(float)v.size());
+		//å…±é€šæ³•ç·šã‚’ä½¿ç”¨ã™ã‚‹å…¨ã¦ã®é ‚ç‚¹ãƒ‡ãƒ¼ã‚¿ã«æ›¸ãã“ã‚€
+		for (unsigned short index : v)
+		{
+			vertices[index].normal = { normal.m128_f32[0], normal.m128_f32[1] , normal.m128_f32[2] };
+		}
+	}
 }

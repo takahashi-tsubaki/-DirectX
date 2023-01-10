@@ -1,11 +1,6 @@
 #pragma once
 
-#include "../2D/SpriteManager.h"
-
-#include "ViewProjection.h"
-#include "WorldTransform.h"
 #include "Mesh.h"
-
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -17,125 +12,82 @@ class Model {
 private: // エイリアス
   // Microsoft::WRL::を省略
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
-
-public: // 列挙子
-  /// <summary>
-  /// ルートパラメータ番号
-  /// </summary>
-	enum class RoomParameter {
-		kWorldTransform, // ワールド変換行列
-		kViewProjection, // ビュープロジェクション変換行列
-		kMaterial,       // マテリアル
-		kTexture,        // テクスチャ
-		kLight,          // ライト
-	};
+	// DirectX::を省略
+	using XMFLOAT2 = DirectX::XMFLOAT2;
+	using XMFLOAT3 = DirectX::XMFLOAT3;
+	using XMFLOAT4 = DirectX::XMFLOAT4;
+	using XMMATRIX = DirectX::XMMATRIX;
 
 private:
-	static const std::string kBaseDirectory;
-	static const std::string kDefaultModelName;
+	static const std::string baseDirectory;
 
 private: // 静的メンバ変数
-  // デスクリプタサイズ
-	static UINT sDescriptorHandleIncrementSize_;
-	// コマンドリスト
-	static ID3D12GraphicsCommandList* sCommandList_;
-	// ルートシグネチャ
-	static Microsoft::WRL::ComPtr<ID3D12RootSignature> sRootSignature_;
-	// パイプラインステートオブジェクト
-	static Microsoft::WRL::ComPtr<ID3D12PipelineState> sPipelineState_;
+  // デバイス
+	static ID3D12Device* device;
+	// デスクリプタサイズ
+	static UINT descriptorHandleIncrementSize;
 
 public: // 静的メンバ関数
   /// <summary>
   /// 静的初期化
   /// </summary>
-	static void StaticInitialize();
+  /// <param name="device">デバイス</param>
+	static void StaticInitialize(ID3D12Device* device);
 
 	/// <summary>
-	/// グラフィックスパイプラインの初期化
+	/// OBJファイルからメッシュ生成
 	/// </summary>
-	static void InitializeGraphicsPipeline();
-
-	/// <summary>
-/// 3Dモデル生成
-/// </summary>
-/// <returns></returns>
-	static Model* Create();
-
-	// OBJファイルからメッシュ生成
-	///
-	//モデル名
-	//エッジ平滑化フラグ
+	/// <param name="modelname">モデル名</param>
+	/// <returns>生成されたモデル</returns>
+	/*static Model* CreateFromOBJ(const std::string& modelname);*/
 	static Model* CreateFromOBJ(const std::string& modelname, bool smoothing = false);
 
-/// 描画前処理
-//描画コマンドリスト
-	static void PreDraw(ID3D12GraphicsCommandList* commandList);
-
-	/// <summary>
-	/// 描画後処理
-	/// </summary>
-	static void PostDraw();
 
 public: // メンバ関数
+  /// <summary>
   /// デストラクタ
+  /// </summary>
 	~Model();
 
-	// 初期化
-	//モデル名</param>
-	//エッジ平滑化フラグ
-	void Initialize(const std::string& modelname, bool smoothing = false);
+	/// <summary>
+	/// 初期化
+	/// </summary>
+	/// <param name="modelname">モデル名</param>
+	void Initialize(const std::string& modelname, bool smoothing);
 
 	/// <summary>
 	/// 描画
 	/// </summary>
-	/// <param name="worldTransform">ワールドトランスフォーム</param>
-	/// <param name="viewProjection">ビュープロジェクション</param>
-	void Draw(
-		const WorldTransform& worldTransform, const ViewProjection& viewProjection);
-
-	/// <summary>
-	/// 描画（テクスチャ差し替え）
-	/// </summary>
-	/// <param name="worldTransform">ワールドトランスフォーム</param>
-	/// <param name="viewProjection">ビュープロジェクション</param>
-	/// <param name="textureHadle">テクスチャハンドル</param>
-	void Draw(
-		const WorldTransform& worldTransform, const ViewProjection& viewProjection,
-		uint32_t textureHadle);
-
-	/// <summary>
-	/// メッシュコンテナを取得
-	/// </summary>
-	/// <returns>メッシュコンテナ</returns>
-	inline const std::vector<Mesh*>& GetMeshes() { return meshes_; }
+	/// <param name="cmdList">命令発行先コマンドリスト</param>
+	void Draw(ID3D12GraphicsCommandList* cmdList);
 
 private: // メンバ変数
   // 名前
-	std::string name_;
+	std::string name;
 	// メッシュコンテナ
-	std::vector<Mesh*> meshes_;
+	std::vector<Mesh*> meshes;
 	// マテリアルコンテナ
-	std::unordered_map<std::string, Material*> materials_;
+	std::unordered_map<std::string, Material*> materials;
 	// デフォルトマテリアル
-	Material* defaultMaterial_ = nullptr;
+	Material* defaultMaterial = nullptr;
+	// デスクリプタヒープ
+	ComPtr<ID3D12DescriptorHeap> descHeap;
 
 private: // メンバ関数
   /// <summary>
-  /// モデル読み込み
+  /// マテリアル読み込み
   /// </summary>
-  /// <param name="modelname">モデル名</param>
-  /// <param name="modelname">エッジ平滑化フラグ</param>
-	void LoadModel(const std::string& modelname, bool smoothing);
-
-	/// <summary>
-	/// マテリアル読み込み
-	/// </summary>
 	void LoadMaterial(const std::string& directoryPath, const std::string& filename);
 
 	/// <summary>
 	/// マテリアル登録
 	/// </summary>
 	void AddMaterial(Material* material);
+
+	/// <summary>
+	/// デスクリプタヒープの生成
+	/// </summary>
+	void CreateDescriptorHeap();
 
 	/// <summary>
 	/// テクスチャ読み込み

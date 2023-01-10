@@ -1,12 +1,16 @@
-#include "../Core/DirectXCommon.h"
-#include "../2D/SpriteManager.h"
-
-#include "Material.h"
+ï»¿#include "Material.h"
 #include <DirectXTex.h>
 #include <cassert>
 
 using namespace DirectX;
 using namespace std;
+
+/// <summary>
+/// é™çš„ãƒ¡ãƒ³ãƒå¤‰æ•°ã®å®Ÿä½“
+/// </summary>
+ID3D12Device* Material::device = nullptr;
+
+void Material::StaticInitialize(ID3D12Device* device) { Material::device = device; }
 
 Material* Material::Create() {
 	Material* instance = new Material;
@@ -17,79 +21,116 @@ Material* Material::Create() {
 }
 
 void Material::Initialize() {
-	// ’è”ƒoƒbƒtƒ@‚Ì¶¬
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ç”Ÿæˆ
 	CreateConstantBuffer();
 }
 
 void Material::CreateConstantBuffer() {
 	HRESULT result;
 
-	// ƒq[ƒvƒvƒƒpƒeƒB
+	// ãƒ’ãƒ¼ãƒ—ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£
 	CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-	// ƒŠƒ\[ƒXİ’è
+	// ãƒªã‚½ãƒ¼ã‚¹è¨­å®š
 	CD3DX12_RESOURCE_DESC resourceDesc =
-		CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff);
+	  CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB1) + 0xff) & ~0xff);
 
-	// ’è”ƒoƒbƒtƒ@‚Ì¶¬
-	result = DirectXCommon::GetInstance()->GetDevice()->CreateCommittedResource(
-		&heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
-		IID_PPV_ARGS(&constBuff_));
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ç”Ÿæˆ
+	result = device->CreateCommittedResource(
+	  &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+	  IID_PPV_ARGS(&constBuff));
 	assert(SUCCEEDED(result));
 
-	// ’è”ƒoƒbƒtƒ@‚Æ‚Ìƒf[ƒ^ƒŠƒ“ƒN
-	result = constBuff_->Map(0, nullptr, (void**)&constMap_);
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã®ãƒãƒƒãƒ”ãƒ³ã‚°
+	result = constBuff->Map(0, nullptr, (void**)&constMap);
 	assert(SUCCEEDED(result));
 }
 
-void Material::LoadTexture(const std::string& directoryPath) {
-	// ƒeƒNƒXƒ`ƒƒ‚È‚µ
-	if (textureFilename_.size() == 0) {
-		textureFilename_ = "white1x1.png";
+void Material::LoadTexture(
+  const std::string& directoryPath, CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle,
+  CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle) {
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãªã—
+	if (textureFilename.size() == 0) {
+		textureFilename = "white1x1.png";
 	}
+
+	cpuDescHandleSRV = cpuHandle;
+	gpuDescHandleSRV = gpuHandle;
 
 	HRESULT result = S_FALSE;
 
-	// WICƒeƒNƒXƒ`ƒƒ‚Ìƒ[ƒh
 	TexMetadata metadata{};
 	ScratchImage scratchImg{};
 
-	// ƒtƒ@ƒCƒ‹ƒpƒX‚ğŒ‹‡
-	string filepath = directoryPath + textureFilename_;
+	// ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‘ã‚¹ã‚’çµåˆ
+	string filepath = directoryPath + textureFilename;
+	wchar_t wfilepath[128];
 
-	// ƒeƒNƒXƒ`ƒƒ“Ç‚İ‚İ
-	textureHandle_ = SpriteManager::Load(filepath);
+	// ãƒ¦ãƒ‹ã‚³ãƒ¼ãƒ‰æ–‡å­—åˆ—ã«å¤‰æ›
+	MultiByteToWideChar(CP_ACP, 0, filepath.c_str(), -1, wfilepath, _countof(wfilepath));
+
+	// WICãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ­ãƒ¼ãƒ‰
+	result = LoadFromWICFile(wfilepath, WIC_FLAGS_NONE, &metadata, scratchImg);
+	assert(SUCCEEDED(result));
+
+	ScratchImage mipChain{};
+	// ãƒŸãƒƒãƒ—ãƒãƒƒãƒ—ç”Ÿæˆ
+	result = GenerateMipMaps(
+	  scratchImg.GetImages(), scratchImg.GetImageCount(), scratchImg.GetMetadata(),
+	  TEX_FILTER_DEFAULT, 0, mipChain);
+	if (SUCCEEDED(result)) {
+		scratchImg = std::move(mipChain);
+		metadata = scratchImg.GetMetadata();
+	}
+
+	// èª­ã¿è¾¼ã‚“ã ãƒ‡ã‚£ãƒ•ãƒ¥ãƒ¼ã‚ºãƒ†ã‚¯ã‚¹ãƒãƒ£ã‚’SRGBã¨ã—ã¦æ‰±ã†
+	metadata.format = MakeSRGB(metadata.format);
+
+	// ãƒªã‚½ãƒ¼ã‚¹è¨­å®š
+	CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(
+	  metadata.format, metadata.width, (UINT)metadata.height, (UINT16)metadata.arraySize,
+	  (UINT16)metadata.mipLevels);
+	// ãƒ’ãƒ¼ãƒ—ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£
+	CD3DX12_HEAP_PROPERTIES heapProps =
+	  CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
+
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ç”¨ãƒãƒƒãƒ•ã‚¡ã®ç”Ÿæˆ
+	result = device->CreateCommittedResource(
+	  &heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+	  IID_PPV_ARGS(&texbuff));
+	assert(SUCCEEDED(result));
+
+	// ãƒ†ã‚¯ã‚¹ãƒãƒ£ãƒãƒƒãƒ•ã‚¡ã«ãƒ‡ãƒ¼ã‚¿è»¢é€
+	for (size_t i = 0; i < metadata.mipLevels; i++) {
+		const Image* img = scratchImg.GetImage(i, 0, 0); // ç”Ÿãƒ‡ãƒ¼ã‚¿æŠ½å‡º
+		result = texbuff->WriteToSubresource(
+		  (UINT)i,
+		  nullptr,              // å…¨é ˜åŸŸã¸ã‚³ãƒ”ãƒ¼
+		  img->pixels,          // å…ƒãƒ‡ãƒ¼ã‚¿ã‚¢ãƒ‰ãƒ¬ã‚¹
+		  (UINT)img->rowPitch,  // 1ãƒ©ã‚¤ãƒ³ã‚µã‚¤ã‚º
+		  (UINT)img->slicePitch // 1æšã‚µã‚¤ã‚º
+		);
+		assert(SUCCEEDED(result));
+	}
+
+	// ã‚·ã‚§ãƒ¼ãƒ€ãƒªã‚½ãƒ¼ã‚¹ãƒ“ãƒ¥ãƒ¼ä½œæˆ
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{}; // è¨­å®šæ§‹é€ ä½“
+	D3D12_RESOURCE_DESC resDesc = texbuff->GetDesc();
+
+	srvDesc.Format = resDesc.Format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D; // 2Dãƒ†ã‚¯ã‚¹ãƒãƒ£
+	srvDesc.Texture2D.MipLevels = 1;
+
+	device->CreateShaderResourceView(
+	  texbuff.Get(), //ãƒ“ãƒ¥ãƒ¼ã¨é–¢é€£ä»˜ã‘ã‚‹ãƒãƒƒãƒ•ã‚¡
+	  &srvDesc,      //ãƒ†ã‚¯ã‚¹ãƒãƒ£è¨­å®šæƒ…å ±
+	  cpuDescHandleSRV);
 }
 
 void Material::Update() {
-	// ’è”ƒoƒbƒtƒ@‚Öƒf[ƒ^“]‘—
-	constMap_->ambient = ambient_;
-	constMap_->diffuse = diffuse_;
-	constMap_->specular = specular_;
-	constMap_->alpha = alpha_;
-}
-
-void Material::SetGraphicsCommand(
-	ID3D12GraphicsCommandList* commandList, UINT rooParameterIndexMaterial,
-	UINT rooParameterIndexTexture) {
-
-	// SRV‚ğƒZƒbƒg
-	SpriteManager::GetInstance()->SetGraphicsRootDescriptorTable(
-		commandList, rooParameterIndexTexture, textureHandle_);
-
-	// ƒ}ƒeƒŠƒAƒ‹‚Ì’è”ƒoƒbƒtƒ@‚ğƒZƒbƒg
-	commandList->SetGraphicsRootConstantBufferView(
-		rooParameterIndexMaterial, constBuff_->GetGPUVirtualAddress());
-}
-
-void Material::SetGraphicsCommand(
-	ID3D12GraphicsCommandList* commandList, UINT rooParameterIndexMaterial,
-	UINT rooParameterIndexTexture, uint32_t textureHandle) {
-
-	// SRV‚ğƒZƒbƒg
-	SpriteManager::GetInstance()->SetGraphicsRootDescriptorTable(
-		commandList, rooParameterIndexTexture, textureHandle);
-
-	// ƒ}ƒeƒŠƒAƒ‹‚Ì’è”ƒoƒbƒtƒ@‚ğƒZƒbƒg
-	commandList->SetGraphicsRootConstantBufferView(
-		rooParameterIndexMaterial, constBuff_->GetGPUVirtualAddress());
+	// å®šæ•°ãƒãƒƒãƒ•ã‚¡ã¸ãƒ‡ãƒ¼ã‚¿è»¢é€
+	constMap->ambient = ambient;
+	constMap->diffuse = diffuse;
+	constMap->specular = specular;
+	constMap->alpha = alpha;
 }
