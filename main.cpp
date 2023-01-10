@@ -61,6 +61,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 
 	Sprite::LoadTexture(1, L"Resources/kuribo-.jpg");
 
+	Sprite::LoadTexture(2, L"Resources/mario.jpg");
+
 	sprite = Sprite::Create(1,{0.0f,0.0f});
 
 	Model* model = nullptr;
