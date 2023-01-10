@@ -21,7 +21,7 @@ public:
 	/// <summary>
 	/// ‰Šú‰»
 	/// </summary>
-	void Initialize(WinApp*winApp);
+	void Initialize(WinApp* winApp);
 
 	/// <summary>
 	/// XV
@@ -46,6 +46,8 @@ public:
 	/// <param name="keyNum"></param>
 	/// <returns>—£‚³‚ê‚½‚©‚Ç‚¤‚©</returns>
 	bool ReleaseKey(BYTE keyNum);
+
+	static Input* GetInstance();
 
 	//ƒƒ“ƒo•Ï”
 private:
