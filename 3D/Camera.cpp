@@ -188,3 +188,4 @@ void Camera::MoveVector(const XMVECTOR & move)
 	SetEye(eye_moved);
 	SetTarget(target_moved);
 }
+
