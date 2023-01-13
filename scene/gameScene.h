@@ -29,11 +29,9 @@ private:
 	Camera* camera_ = nullptr;
 	Light* light_ = nullptr;
 
-	Sprite* sprite_ = nullptr;
 
-
-	Model* modelskydome_ = nullptr;
-	Object3d* skydome_ = nullptr;
+	Model* modelPlayer_ = nullptr;
+	Object3d* player_ = nullptr;
 
 
 };
