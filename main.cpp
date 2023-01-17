@@ -96,7 +96,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int)
 	Input* input = nullptr;
 	WinApp* winApp = nullptr;
 	FPS* fps = nullptr;
-	fps->SetFrameRate(60);
+	fps = new FPS();
+	fps->SetFrameRate(60.0f);
 
 	winApp = new WinApp();
 	winApp->Initialize();
