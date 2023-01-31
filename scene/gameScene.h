@@ -1,6 +1,6 @@
 #pragma once
 #include "../Core/DirectXCommon.h"
-#include "../Input.h"
+#include "../input/Input.h"
 
 #include "../2D/Sprite.h"
 
@@ -35,5 +35,7 @@ private:
 	Model* modelskydome_ = nullptr;
 	Object3d* skydome_ = nullptr;
 
+	Model* modelPlayer_ = nullptr;
+	Object3d* player_ = nullptr;
 
 };

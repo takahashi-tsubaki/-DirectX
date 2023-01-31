@@ -46,15 +46,21 @@
     <Filter Include="ヘッダー ファイル\scene">
       <UniqueIdentifier>{df7ad0a1-adf2-4f09-b109-bed0e18dc983}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\audio">
+      <UniqueIdentifier>{0afe7798-7990-4934-aa04-19a0b2d12b5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\input">
+      <UniqueIdentifier>{30d0ca35-a700-46b5-a467-f5c17cc40533}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\audio">
+      <UniqueIdentifier>{734d75db-58de-43ad-b0e2-353ea6916af0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\input">
+      <UniqueIdentifier>{c57df781-5ff9-465f-86cb-6e16d959252c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Audio.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Core\DirectXCommon.cpp">
@@ -105,14 +111,14 @@
     <ClCompile Include="scene\gameScene.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
+    <ClCompile Include="audio\Audio.cpp">
+      <Filter>ソース ファイル\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="input\Input.cpp">
+      <Filter>ソース ファイル\input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Input.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Audio.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Core\DirectXCommon.h">
       <Filter>ヘッダー ファイル\Core</Filter>
     </ClInclude>
@@ -164,6 +170,12 @@
     <ClInclude Include="scene\gameScene.h">
       <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
+    <ClInclude Include="audio\Audio.h">
+      <Filter>ヘッダー ファイル\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="input\Input.h">
+      <Filter>ヘッダー ファイル\input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Sprite.hlsli">
@@ -172,7 +184,7 @@
     <None Include="Resources\shaders\BasicShaderHeader.hlsli">
       <Filter>シェーダーファイル</Filter>
     </None>
-    <None Include="ObjBasicShader.hlsli">
+    <None Include="Resources\shaders\OBJShaderHeader.hlsli">
       <Filter>シェーダーファイル</Filter>
     </None>
   </ItemGroup>
@@ -189,10 +201,10 @@
     <FxCompile Include="Resources\shaders\BasicVertexShader.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
-    <FxCompile Include="ObjVS.hlsl">
+    <FxCompile Include="Resources\shaders\OBJVertexShader.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
-    <FxCompile Include="ObjPS.hlsl">
+    <FxCompile Include="Resources\shaders\OBJPixelShader.hlsl">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
   </ItemGroup>

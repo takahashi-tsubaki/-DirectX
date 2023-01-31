@@ -150,11 +150,11 @@
     <ClCompile Include="3D\Mesh.cpp" />
     <ClCompile Include="3D\Model.cpp" />
     <ClCompile Include="3D\Object3d.cpp" />
-    <ClCompile Include="Audio.cpp" />
+    <ClCompile Include="audio\Audio.cpp" />
     <ClCompile Include="Core\DirectXCommon.cpp" />
     <ClCompile Include="Core\FPS.cpp" />
     <ClCompile Include="Core\WinApp.cpp" />
-    <ClCompile Include="Input.cpp" />
+    <ClCompile Include="input\Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\Matrix4.cpp" />
     <ClCompile Include="math\MyMath.cpp" />
@@ -171,12 +171,12 @@
     <ClInclude Include="3D\Mesh.h" />
     <ClInclude Include="3D\Model.h" />
     <ClInclude Include="3D\object3d.h" />
-    <ClInclude Include="Audio.h" />
+    <ClInclude Include="audio\Audio.h" />
     <ClInclude Include="Core\DirectXCommon.h" />
     <ClInclude Include="Core\ErrorException.h" />
     <ClInclude Include="Core\FPS.h" />
     <ClInclude Include="Core\WinApp.h" />
-    <ClInclude Include="Input.h" />
+    <ClInclude Include="input\Input.h" />
     <ClInclude Include="math\Matrix4.h" />
     <ClInclude Include="math\MyMath.h" />
     <ClInclude Include="math\Vector2.h" />
@@ -184,23 +184,11 @@
     <ClInclude Include="scene\gameScene.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ObjBasicShader.hlsli" />
     <None Include="Resources\shaders\BasicShaderHeader.hlsli" />
+    <None Include="Resources\shaders\OBJShaderHeader.hlsli" />
     <None Include="Resources\shaders\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ObjPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="ObjVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
     <FxCompile Include="Resources\shaders\BasicPixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
@@ -212,6 +200,18 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\OBJPixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\shaders\OBJVertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Resources\shaders\SpritePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
