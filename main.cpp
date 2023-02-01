@@ -3,7 +3,6 @@
 #include "Core/DirectXCommon.h"
 #include "Core/FPS.h"
 #include "scene/gameScene.h"
-
 #include "../audio/Audio.h"
 
 void DebugOutputFormatString(const char* format, ...) {
