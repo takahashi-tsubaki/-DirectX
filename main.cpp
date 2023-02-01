@@ -1,10 +1,9 @@
-﻿#include "Input.h"
+﻿#include "../input/Input.h"
 #include "Core/WinApp.h"
 #include "Core/DirectXCommon.h"
 #include "Core/FPS.h"
 #include "scene/gameScene.h"
-
-#include "Audio.h"
+#include "../audio/Audio.h"
 
 void DebugOutputFormatString(const char* format, ...) {
 #ifdef _DEBUG

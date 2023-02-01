@@ -1,0 +1,9 @@
+newmtl initialShadingGroup
+illum 2
+Ka 1.0000 1.0000 1.0000
+Kd 0.0000 0.0000 0.0000
+Ks 0.0000 0.0000 0.0000
+Tf 1.00 1.00 1.00
+Ni 1.00
+
+map_Kd sphere.png

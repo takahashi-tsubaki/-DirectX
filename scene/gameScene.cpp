@@ -24,10 +24,19 @@ void GameScene::Initalize()
 	Sprite::LoadTexture(1, L"Resources/kuribo-.jpg");
 	sprite_ = Sprite::Create(1, { 0.0f,0.0f });
 
-	modelskydome_ = Model::CreateFromOBJ("skydome");
+	modelskydome_ = Model::CreateFromOBJ("sphere");
 	skydome_ = Object3d::Create();
 	//モデルをセット
 	skydome_->SetModel(modelskydome_);
+	skydome_->SetPosition({ -5,0,-10 });
+
+
+
+	modelPlayer_ = Model::CreateFromOBJ("player");
+	player_ = Object3d::Create();
+	//モデルをセット
+	player_->SetModel(modelPlayer_);
+	player_->SetPosition({5,0,0});
 
 }
 
@@ -36,6 +45,8 @@ void GameScene::Update()
 	camera_->Update();
 
 	skydome_->Update();
+
+	player_->Update();
 
 	light_->Update();
 }
@@ -61,6 +72,9 @@ void GameScene::Draw()
 
 	// 3Dオブジェクトの描画
 	skydome_->Draw();
+
+	player_->Draw();
+
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
