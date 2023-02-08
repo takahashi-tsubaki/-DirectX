@@ -9,6 +9,9 @@
 #include "../3D/Camera.h"
 #include "../3D/Light.h"
 
+#include "../collision/collisionPrimitive.h"
+#include "../collision/Collision.h"
+
 class GameScene
 {
 
@@ -22,6 +25,12 @@ public:
 	void Update();
 
 	void Draw();
+
+	void Down();
+
+	void Up();
+
+	
 
 private:
 	DirectXCommon* dxCommon_ = nullptr;
@@ -38,4 +47,19 @@ private:
 	Model* modelPlayer_ = nullptr;
 	Object3d* player_ = nullptr;
 
+	Model* modelGround_ = nullptr;
+	Object3d* ground_ = nullptr;
+
+	Model* changeSphere = nullptr;
+	Object3d* changeModel = nullptr;
+
+	Sphere sphere;
+	Plane plane;
+
+	XMVECTOR moveY;
+
+	bool isDown = true;
+	bool isUp = false;
+
+	float posY = 0.0f;
 };

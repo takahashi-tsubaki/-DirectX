@@ -58,6 +58,12 @@
     <Filter Include="ヘッダー ファイル\input">
       <UniqueIdentifier>{c57df781-5ff9-465f-86cb-6e16d959252c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\collision">
+      <UniqueIdentifier>{09f77472-c93c-4791-87f1-c609489849a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\collision">
+      <UniqueIdentifier>{5bc12b23-b97e-40a9-adaf-79dc00a8e97e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -117,6 +123,9 @@
     <ClCompile Include="input\Input.cpp">
       <Filter>ソース ファイル\input</Filter>
     </ClCompile>
+    <ClCompile Include="collision\Collision.cpp">
+      <Filter>ソース ファイル\collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\DirectXCommon.h">
@@ -175,6 +184,12 @@
     </ClInclude>
     <ClInclude Include="input\Input.h">
       <Filter>ヘッダー ファイル\input</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\collisionPrimitive.h">
+      <Filter>ヘッダー ファイル\collision</Filter>
+    </ClInclude>
+    <ClInclude Include="collision\Collision.h">
+      <Filter>ヘッダー ファイル\collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

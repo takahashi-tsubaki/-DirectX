@@ -32,21 +32,58 @@ void GameScene::Initalize()
 
 
 
-	modelPlayer_ = Model::CreateFromOBJ("player");
+	modelPlayer_ = Model::CreateFromOBJ("sphere");
 	player_ = Object3d::Create();
 	//モデルをセット
 	player_->SetModel(modelPlayer_);
-	player_->SetPosition({5,0,0});
+	player_->SetPosition({ 6,0,0 });
 
+	modelGround_ = Model::CreateFromOBJ("Wall");
+	ground_ = Object3d::Create();
+	ground_->SetModel(modelGround_);
+	ground_->SetPosition({0,-5,0});
+	ground_->SetScale({ 1,0.1f,0.1f });
+
+	changeSphere = Model::CreateFromOBJ("skydome");
+	
+	//球の座標をプレイヤーに置き換え
+	sphere.center = XMVectorSet(0,5,0,1);
+	sphere.radius = 1.0f;
+
+	//平面の座標の置き換え
+	plane.normal = XMVectorSet(0,1,0,0);
+	plane.distance = 0.0f;
 }
 
 void GameScene::Update()
 {
+	moveY = XMVectorSet(0,0.1f,0,0);
+	if (isDown == true)
+	{
+		Down();
+	}
+	if (isUp == true)
+	{
+		Up();
+	}
+
+	bool isHit = Collision::CheckSphere2Plane(sphere, plane);
+	if (isHit)
+	{
+		player_->SetColor({1,0,0,1});
+	}
+	else
+	{
+		player_->SetColor({1,1,1,1});
+	}
+	
 	camera_->Update();
 
 	skydome_->Update();
 
 	player_->Update();
+
+	ground_->Update();
 
 	light_->Update();
 }
@@ -71,9 +108,11 @@ void GameScene::Draw()
 	Object3d::PreDraw(dxCommon_->GetCommandList());
 
 	// 3Dオブジェクトの描画
-	skydome_->Draw();
+	/*skydome_->Draw();*/
 
 	player_->Draw();
+
+	ground_->Draw();
 
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
@@ -90,10 +129,35 @@ void GameScene::Draw()
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-	sprite_->Draw();
+	/*sprite_->Draw();*/
 	//
 	// スプライト描画後処理
 	Sprite::PostDraw();
 
 #pragma endregion
 }
+
+void GameScene::Down()
+{
+	sphere.center -= moveY;
+	posY -= 0.1f;
+	player_->SetPosition({ player_->GetPosition().x,posY,player_->GetPosition().z });
+	if (posY < -5)
+	{
+		isUp = true;
+		isDown = false;
+	}
+}
+
+void GameScene::Up()
+{
+	sphere.center += moveY;
+	posY += 0.1f;
+	player_->SetPosition({ player_->GetPosition().x,posY,player_->GetPosition().z });
+	if (posY > 5)
+	{
+		isUp = false;
+		isDown = true;
+	}
+}
+

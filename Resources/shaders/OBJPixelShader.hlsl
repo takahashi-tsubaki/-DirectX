@@ -37,5 +37,5 @@ float4 main(VSOutput input) : SV_TARGET
 	//全て加算する
 	shadecolor.rgb = (ambient + diffuse + specular)*lightColor;
 	shadecolor.a = m_alpha;
-	return shadecolor * texcolor;
+	return shadecolor * texcolor * color;
 }

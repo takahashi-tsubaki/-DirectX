@@ -42,6 +42,8 @@ public: // サブクラス
 		XMMATRIX viewproj; //ビュープロジェクション行列
 		XMMATRIX world;//ワールド行列
 		XMFLOAT3 cameraPos;//カメラ座標
+		float pad1;
+		XMFLOAT4 color;
 	};
 
 private: // 定数
@@ -144,6 +146,7 @@ public: // メンバ関数
 		Object3d::light = light;
 	}
 
+	void SetColor(XMFLOAT4 color){this->color = color;}
 private: // メンバ変数
 	ComPtr<ID3D12Resource> constBuffB0; // 定数バッファ
 	// 色

@@ -151,6 +151,7 @@
     <ClCompile Include="3D\Model.cpp" />
     <ClCompile Include="3D\Object3d.cpp" />
     <ClCompile Include="audio\Audio.cpp" />
+    <ClCompile Include="collision\Collision.cpp" />
     <ClCompile Include="Core\DirectXCommon.cpp" />
     <ClCompile Include="Core\FPS.cpp" />
     <ClCompile Include="Core\WinApp.cpp" />
@@ -172,6 +173,8 @@
     <ClInclude Include="3D\Model.h" />
     <ClInclude Include="3D\object3d.h" />
     <ClInclude Include="audio\Audio.h" />
+    <ClInclude Include="collision\Collision.h" />
+    <ClInclude Include="collision\collisionPrimitive.h" />
     <ClInclude Include="Core\DirectXCommon.h" />
     <ClInclude Include="Core\ErrorException.h" />
     <ClInclude Include="Core\FPS.h" />
